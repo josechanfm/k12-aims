@@ -60,12 +60,6 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
-    public function staff(){
-        return $this->hasOne(Staff::class);
-        //return Staff::where('user_id',$this->id)->first();
-    }
 
-    public function guardian(){
-        return $this->hasOne(Guardian::class);
-    }
+
 }

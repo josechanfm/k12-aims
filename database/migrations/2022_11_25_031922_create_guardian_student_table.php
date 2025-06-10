@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('guardian_student', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('guardian_id')->on('gardians')->onDelete('restrict');
+            $table->foreignId('guardian_id')->on('guardians')->onDelete('restrict');
             $table->foreignId('student_id')->on('students')->onDelete('restrict');
             $table->string('relationship');
             $table->timestamps();

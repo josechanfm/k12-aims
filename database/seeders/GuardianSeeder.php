@@ -4,8 +4,12 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Guardian;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use App\Models\Guardian;
+use App\Models\Team;
 
 class GuardianSeeder extends Seeder
 {
@@ -16,16 +20,18 @@ class GuardianSeeder extends Seeder
      */
     public function run()
     {
-        Guardian::factory()->count(1000)->create();
-        Guardian::find(1)->update(["user_id"=>100]);
-        Guardian::find(2)->update(["user_id"=>101]);
-        Guardian::find(3)->update(["user_id"=>102]);
-        Guardian::find(4)->update(["user_id"=>103]);
-
-        // DB::table('guardian_student')->insert([
-        //     'guardian_id'=>1,
-        //     'student_id'=>101,
-        // ]);
+      
+        $guardian=Guardian::create([
+            'username'=>'guardian',
+            'name' => 'Guardian',
+            'email' => 'guardian@example.com',
+            'password' => Hash::make('password'),
+        ]);
+        // $guardian->ownedTeams()->save(Team::forceCreate([
+        //     'user_id' => $guardian->id,
+        //     'name' => explode(' ', $guardian->name, 2)[0]."'s Team",
+        //     'personal_team' => true,
+        // ]));
 
     }
 }

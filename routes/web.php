@@ -344,13 +344,29 @@ Route::group([
 
 
 
+// Route::group([
+//     'prefix'=>'/guardian',
+//     'middleware'=>[
+//         'auth:sanctum',
+//         config('jetstream.auth_session'),
+//         'verified',
+//         ]
+// ],function () {
+//     Route::get('/',[App\Http\Controllers\Guardian\DashboardController::class,'index'])->name('guardian.dashboard');
+// });
+
 Route::group([
-    'prefix'=>'/guardian',
+    'prefix'=>'/student',
     'middleware'=>[
         'auth:sanctum',
         config('jetstream.auth_session'),
         'verified',
         ]
 ],function () {
-    Route::get('/',[App\Http\Controllers\Guardian\DashboardController::class,'index'])->name('guardian.dashboard');
+    Route::get('/', function () {
+        dd('student');
+    })->name('student');
+
 });
+
+require __DIR__ . '/auth.php';

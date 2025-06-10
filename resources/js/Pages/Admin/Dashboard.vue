@@ -6,6 +6,13 @@
             </h2>
         </template>
         <hr/>
+        {{ $page.props.user }}
+        <div v-role="['director']">
+            director
+        </div>
+        <div v-role="['admin']">
+            admin
+        </div>
         <ul>
             <li v-for="grade in grades">{{ grade.tag }}</li>
         </ul>

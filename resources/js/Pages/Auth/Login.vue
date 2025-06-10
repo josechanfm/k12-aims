@@ -20,6 +20,7 @@ const form = useForm({
     username:'master',
     password: 'password',
     remember: false,
+
 });
 
 const submit = () => {
@@ -65,7 +66,7 @@ const submit = () => {
                 <InputError class="mt-2" :message="form.errors.email" /> -->
             </div>
             <div>
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="username" value="Username" />
                 <TextInput
                     id="email"
                     v-model="form.username"
