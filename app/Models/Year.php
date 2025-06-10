@@ -57,12 +57,12 @@ class Year extends Model
     }
     public function autoGenerate($data){
         $gradeLetters=array_column(Config::item('grade_years'),null,'value');
-        $klass_letter_map=Config::item('klass_letter_map');
+        $klass_letter_map=array_column(Config::item('klass_letters'),'value','label');
         
         $kklass=$data['kklass'];
         $kgrade=$data['kgrade'];
-        $pklass=$data['pklass'];
-        $pgrade=$data['pgrade'];
+        $allKlass=$data['pklass'];
+        $allGrade=$data['pgrade'];
         $sklass=$data['sklass'];
         $sgrade=$data['sgrade'];
 
@@ -72,7 +72,7 @@ class Year extends Model
         //如果沒有相應學習計劃，study_id設為0
        
         $gradeYear=4;
-        for($i=1;$i<=$pgrade;$i++){
+        for($i=1;$i<=$allGrade;$i++){
             $g['year_id']=$this->id;
             $g['initial']=$gradeLetters[$gradeYear]->initial;
             $g['grade_year']=$gradeYear++;
@@ -85,7 +85,7 @@ class Year extends Model
             $g['behaviour_scheme']=json_encode(Config::item('behaviour_scheme'));
             $grade=Grade::create($g);
             $k=[];
-            for($j=1;$j<=$pklass;$j++){
+            for($j=1;$j<=$allKlass;$j++){
                 $letter=$klassLetters[$j-1];
                 $k['grade_id']=$grade->id;
                 $k['letter']=$klassLetters[$j-1];

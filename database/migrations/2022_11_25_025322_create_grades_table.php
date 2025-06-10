@@ -18,7 +18,8 @@ return new class extends Migration
             $table->foreignId('year_id')->constrained('years')->onDelete('restrict')->onUpdate('cascade');
             $table->integer('grade_year');
             $table->char('initial',2);
-            $table->integer('level');            
+            $table->integer('level');           
+            $table->integer('klass_count')->nullable(); 
             $table->string('tag',5)->nullable();
             $table->string('title_zh')->nullable();
             $table->string('title_en')->nullable();

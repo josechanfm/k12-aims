@@ -26,12 +26,15 @@ class GradeSeeder extends Seeder
         //Kindergarten
         for($i=1;$i<=3;$i++){
             $grade=Grade::firstOrCreate([
+                    'title_zh'=>'K'.$i,
+                    'title_en'=>'K'.$i,
                     'year_id'=>$year->id,
                     'grade_year'=>$i,
                     'initial'=>'K',
                     'level'=>$i,
                     'tag'=>'K'.$i,
                     'version'=>1,
+                    'klass_count'=>3,
                     'transcript_template_id'=>2,
                     'behaviour_scheme'=>["SUBJECT"=>0.3,"KLASS_HEAD"=>0.2,"DIRECTOR"=>0.5,"ADJUST"=>1],
                     'active'=>1
@@ -53,8 +56,6 @@ class GradeSeeder extends Seeder
                 //enrol all klass student to all klass courses
                 $courses=$klass->courses;
                 foreach($courses as $c=>$course){
-                    $course->subject_head_ids=[rand(1,50)];
-                    $course->save();
                     $course->staffs()->attach(rand(1,50));
                     $students=$klass->students->pluck('id')->toArray();
                     $course->students()->sync($students);
@@ -89,8 +90,6 @@ class GradeSeeder extends Seeder
                 $klass->students()->sync($klassStudents);
                 $courses=$klass->courses;
                 foreach($courses as $c=>$course){
-                    $course->subject_head_ids=[rand(1,50)];
-                    $course->save();
                     $course->staffs()->attach(rand(1,50));
                     $students=$klass->students->pluck('id')->toArray();
                     $course->students()->sync($students);
@@ -126,8 +125,6 @@ class GradeSeeder extends Seeder
                 $klass->students()->sync($klassStudents);
                 $courses=$klass->courses;
                 foreach($courses as $c=>$course){
-                    $course->subject_head_ids=[rand(1,50)];
-                    $course->save();
                     $course->staffs()->attach(rand(1,50));
                     $students=$klass->students->pluck('id')->toArray();
                     $course->students()->sync($students);
@@ -162,8 +159,6 @@ class GradeSeeder extends Seeder
                 $klass->students()->sync($klassStudents);
                 $courses=$klass->courses;
                 foreach($courses as $c=>$course){
-                    $course->subject_head_ids=[rand(1,50)];
-                    $course->save();
                     $course->staffs()->attach(rand(1,50));
                     $students=$klass->students->pluck('id')->toArray();
                     $course->students()->sync($students);

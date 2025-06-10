@@ -26,7 +26,6 @@ class GradeController extends Controller
      */
     public function index(Year $year, Request $request)
     {
-        //dd($year);
         if($request->gradeScope){
             switch($request->gradeScope){
                 case 'kindergarten':
@@ -42,15 +41,16 @@ class GradeController extends Controller
                     $grades=Grade::whereBelongsTo($year)->whereBetween('grade_year',[4,9])->orderBy('grade_year')->get();
             }
         }else{
-            $grades=Grade::whereBelongsTo($year)->orderBy('grade_year')->get();
+            $grades=Grade::whereBelongsTo($year)->with(['klasses'])->orderBy('grade_year')->get();
         }
-        
-
+        ///
+        ///
         return Inertia::render('Admin/YearGrades',[
             'years'=>Year::where('active',true)->get(),
             'year'=>$year,
             'grades'=>$grades,
-            'gradeLevels'=>Config::item('grade_years'),
+            'gradeYears'=>Config::item('grade_years'),
+            'klassLetters'=>Config::item('klass_letters')
         ]);
 
         // $yearId=$request->input('yearId');
@@ -83,6 +83,7 @@ class GradeController extends Controller
         $grade=new Grade;
         $grade->year_id=$request->year_id;
         $grade->grade_year=$request->grade_year;
+        $grade->klass_count=$request->klass_count;
         $grade->initial=$request->initial;
         $grade->level=$request->level;
         $grade->tag=$request->initial.$request->level;
@@ -105,15 +106,7 @@ class GradeController extends Controller
      */
     public function show(Year $year, Grade $grade)
     {
-        $klasses=Klass::whereBelongsTo(Grade::find($id))->get();
-        echo json_encode($grade);
-        echo json_encode($klasses);
-        echo $klasses->count();
-        if($klasses->count()>0){
-            echo 'true';
-        }else{
-            echo 'false';
-        };
+       
     }
 
     /**
@@ -137,12 +130,6 @@ class GradeController extends Controller
     public function update(Year $year, Grade $grade, Request $request)
     {
         if($request->has('id')){
-            $grade->year_id=1;
-            $grade->title_zh=$request->title_zh;
-            $grade->title_en=$request->title_en;
-            $grade->description=$request->description;
-            $grade->version=$request->version;
-            $grade->active=$request->active;
             $grade->update($request->all());
         }
         return redirect()->back();

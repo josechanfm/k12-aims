@@ -44,8 +44,51 @@
                     <a-input v-model:value="modal.data.key" />
                 </a-form-item>
                 <a-form-item label="Value" name="value">
-                    <a-textarea v-model:value="modal.data.value" placeholder="textarea with clear icon" allow-clear />
+                    <a-textarea v-model:value="modal.data.value" placeholder="textarea with clear icon"  />
                 </a-form-item>
+                <!--  -->
+                <div v-if="modal.data.key=='grade_years'" class="items-center flex gap-1 flex-col p-1 bg-gray-50 rounded-lg">
+                    <table >
+                        <thead>
+                        <tr class="text-nowrap " >
+                         <td  class=" text-center">系統代號 </td>
+                            <td  class="text-center"></td>
+                            <td  class=" text-center">本校年級代號</td>
+                            <td  class=" text-center"> 本校年級數</td>
+                            <td  class=" text-center">中文名稱  </td>
+                         </tr>
+                         </thead>
+                        <tr class="" :key="grade" v-for="grade in modal.toJson ">
+                            <!-- <div >{{ grade.value }}</div> -->
+                            <td class="w-12 text-lg">{{ grade.label }}</td>
+                            <td class="w-12 font-bold">></td>
+                           <td>
+                             <a-input size="small" @change="modal.data.value=JSON.stringify( modal.toJson) "  class="rounded-lg h-fit w-32 text-center"  v-model:value="grade.initial" />
+                           </td> 
+                           <td>
+                             <a-input-number @change="modal.data.value=JSON.stringify( modal.toJson) " class="text-center " min="1" max="15" v-model:value="grade.level" />
+                           </td> 
+                           <td>
+                             <a-input size="small" @change="modal.data.value=JSON.stringify( modal.toJson) "  class="rounded-lg h-fit w-32 text-center"  v-model:value="grade.zh_name" />
+                           </td> 
+                        </tr>
+                    </table>
+                </div>
+                <!--  -->
+                <!--  -->
+                <div v-if="modal.data.key=='klass_letters'" class="items-center flex gap-1 flex-wrap text-nowrap p-1 bg-gray-50 rounded-lg">
+                    <div  class="flex items-center bg-blue-100 rounded-lg p-2" :key="code" v-for="code in   modal.toJson">
+                            <div class="text-blue-600 font-bold ">
+                                {{ code.label}}
+                            </div>
+                            <div>-></div>
+                            <div>
+                                <a-input size="small" @change="modal.data.value=JSON.stringify( modal.toJson) "  class="!text-sm rounded-lg h-fit w-12 text-center"  v-model:value="code.value" />
+                            </div>
+                    </div>
+                         
+                </div>
+                <!--  -->
                 <a-form-item label="簡介" name="description">
                     <a-textarea v-model:value="modal.data.remark" placeholder="textarea with clear icon" allow-clear />
                 </a-form-item>
@@ -78,6 +121,7 @@ export default {
                 mode: null,
                 isOpen: false,
                 title: 'Configs',
+                toJson:{},
                 data: {}
             },
             columns: [
@@ -144,6 +188,8 @@ export default {
         },
         onClickEdit(record) {
             this.modal.data = { ...record };
+            this.modal.toJson=JSON.parse( this.modal.data.value)
+
             this.modal.title = "Edit Config";
             this.modal.mode = 'EDIT';
             this.modal.isOpen = true;
@@ -201,3 +247,11 @@ export default {
     },
 }
 </script>
+<style scoped>
+:deep(.ant-input-number-input){
+    @apply text-center
+}
+:deep(.ant-input-number-input){
+    @apply text-center
+}
+</style>

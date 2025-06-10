@@ -2,7 +2,6 @@
     <AdminLayout title="年級列表" :breadcrumb="breadcrumb">
         <a-card class="flex flex-col gap-1 shadow-md ">
             <!--  -->
-            
             <div class="flex flex-wrap font-bold text-sm gap-1">
                 
                 <div class=" capsule-outline ">
@@ -29,8 +28,52 @@
                 </a-button>
             </div>
             <!--  -->
-            <a-table :dataSource="grades" :columns="columns" :pagination="{ pageSize: 20 }">
-                <template #bodyCell="{column, text, record, index}">
+            
+            <a-table :dataSource="gradeYears" :pagination="false" size="small">
+                <a-table-column title="系統代號" dataIndex="label" :width="100"></a-table-column>
+                <a-table-column title="已開設年級" :width="120" >
+                    <template #default="{record}">
+                        <a-tag v-if="getGrade(record)">{{getGrade(record).title_zh}} ( {{getGrade(record).title_en}} )</a-tag>
+                         <a-button v-else type="text" class='text-blue-500' @click="quickStoreRecord(record)">點擊開設年級 </a-button>
+                    </template>
+                </a-table-column>
+                <a-table-column title="開設班別數" >
+                    <template #default="{record}">
+                        <div  v-if="getGrade(record)">
+                            <a-input-number 
+                            @change="quickUpdateRecord(getGrade(record))"
+                            :min="1" :max="20" v-model:value="getGrade(record).klass_count"></a-input-number>
+                        </div>
+                    </template>
+                </a-table-column>
+                <a-table-column title="班別(預覽)" >
+                    <template #default="{record}">
+                        <div  v-if="getGrade(record)">
+                            <a-tag :key="letter"    
+                            v-for="(letter) in klassLetters.slice(0,getGrade(record).klass_count)">
+                                {{letter.value}}
+                            </a-tag>
+                        </div>
+                    </template>
+                </a-table-column>
+                <a-table-column title="已開設班別" >
+                    <template #default="{record}">
+                        <div  v-if="getGrade(record)">
+                            <a-tag color="blue" :key="letter"    
+                            v-for="(letter) in  getGrade(record).student_count">
+                                {{letter}}
+                            </a-tag>
+                        </div>
+                    </template>
+                </a-table-column>
+                <a-table-column title="操作">
+                    <template #default="{record}">
+                            <a-button  v-if="getGrade(record)" 
+                                @click="deleteRecord(getGrade(record))" size="small" type="delete">刪除</a-button>
+                            
+                    </template>
+                </a-table-column>
+                <!-- <template #bodyCell="{column, text, record, index}">
                     <div v-if="column.dataIndex=='operation'" class="flex gap-1">
                         <a-button as="link" :href="route('admin.grade.klasses.index',record.id)" size="small" type="info">班別</a-button>
                         <a-button @click="editRecord(record)" size="small" type="edit">修改</a-button>
@@ -50,7 +93,7 @@
                     <template v-else>
                         {{record[column.dataIndex]}}
                     </template>
-                </template>
+                </template> -->
             </a-table>
             <!-- Modal Start-->
             <a-modal v-model:open="modal.isOpen"  :title="modal.title" width="60%" >
@@ -69,7 +112,7 @@
                             style="width: 100%"
                             placeholder="請選擇..."
                             max-tag-count="responsive"
-                            :options="gradeLevels.map(level=>({value:level.value, label:level.label}))"
+                            :options="gradeYears.map(level=>({value:level.value, label:level.label}))"
                             @change="onChangeGradeSelected"
                         ></a-select>
                     </a-form-item>
@@ -120,6 +163,9 @@
                 </template>
             </a-modal>    
             <!-- Modal End-->
+            <!--  -->
+                
+            <!--  -->
         </a-card>
         </AdminLayout>
 </template>
@@ -142,7 +188,7 @@ export default {
         ArrowRightOutlined, CheckSquareOutlined, StopOutlined,
         Modal, ExclamationCircleOutlined, createVNode
     },
-    props: ['years','year','grades','gradeLevels'],
+    props: ['years','year','grades','gradeYears','klassLetters'],
     data() {
         return {
             breadcrumb:[
@@ -154,30 +200,32 @@ export default {
             selectConductValue:'',
             conductObjectKeys:{SUBJECT:'科目老師佔比',KLASS_HEAD:'班主任佔比',DIRECTOR:'主任佔比',ADJUST:'調整佔比'},
             selectedYear:this.year.id,
+            
+           
             modal: {
                 mode:null,
                 isOpen: false,
                 title:'建立學年級別',
                 data:{}
             },
-            columns:[
-                {
-                    title: '年級代號',
-                    dataIndex: 'tag',
-                },{
-                    title: '中文名稱',
-                    dataIndex: 'title_zh',
-                },{
-                    title: '版本',
-                    dataIndex: 'version',
-                },{
-                    title: '有效',
-                    dataIndex: 'active',
-                },{
-                    title: '操作',
-                    dataIndex: 'operation',
-                }
-            ],
+            // columns:[
+            //     {
+            //         title: '年級代號',
+            //         dataIndex: 'tag',
+            //     },{
+            //         title: '中文名稱',
+            //         dataIndex: 'title_zh',
+            //     },{
+            //         title: '版本',
+            //         dataIndex: 'version',
+            //     },{
+            //         title: '有效',
+            //         dataIndex: 'active',
+            //     },{
+            //         title: '操作',
+            //         dataIndex: 'operation',
+            //     }
+            // ],
             rules:{
                 grade_year:{required:true},
                 title_zh:{required:true},
@@ -199,6 +247,11 @@ export default {
      
     },
     methods: {
+        ///
+        getGrade(record){
+            return  this.grades.find(x=>x.grade_year==record.value) 
+        },
+        ///
         vailJsonParse(str){
             try{
                 return JSON.parse( str )
@@ -233,9 +286,45 @@ export default {
             this.modal.title='修改學年級別'
             console.log(record)
         },
+        applyGradeKlass(){
+
+        },
+        quickStoreRecord(record){ 
+           let  data={ "year_id": this.year.id, "klass_count": 3,
+                     "grade_year": record.value,
+                    "title_zh": record.zh_name,
+                    "title_en": record.initial+''+record.level,
+                    "initial": record.initial, 
+                    "level": record.level, 
+                    "transcript_template_id": 1,
+                    "version": "1",
+                    "active": 1 }
+            this.$inertia.post(route('admin.year.grades.store', [this.year.id]),data,{
+                preserveScroll:true,
+                onSuccess:(page)=>{
+                    console.log(page);
+                    this.modal.isOpen=false;
+                },
+                onError:(error)=>{
+                    console.log(error);
+                }
+            });
+           
+        },
+        quickUpdateRecord(record){
+             this.modal.data={...record}
+             this.$inertia.put(route('admin.year.grades.update',[this.year.id,this.modal.data.id]), this.modal.data,{
+                    preserveScroll:true,    
+                    onSuccess:(page)=>{
+                        this.modal.isOpen=false;
+                    },
+                    onError:(error)=>{
+                        console.log(error);
+                    }
+                });
+        },
         updateRecord(){
             this.$refs.modalRef.validateFields().then(()=>{
-                // this.modal.data._method = 'PATCH';
                 this.$inertia.put(route('admin.year.grades.update',[this.year.id,this.modal.data.id]), this.modal.data,{
                     onSuccess:(page)=>{
                         this.modal.isOpen=false;
@@ -272,6 +361,7 @@ export default {
                 cancelText: '取消',
                 onOk: () => {
                     this.$inertia.delete(route('admin.year.grades.destroy', [record.year_id, record.id]), {
+                         preserveScroll:true,
                         onSuccess: (page) => {
                             console.log(record.id+"deleted.");
                         },
@@ -297,8 +387,10 @@ export default {
             //this.$inertia.get(route('admin.year.grades',item));
         },
         onChangeGradeSelected(){
-            var tmp=this.gradeLevels.find(grade=>grade.value==this.modal.data.grade_year);
+            var tmp=this.gradeYears.find(grade=>grade.value==this.modal.data.grade_year);
             console.log(tmp);
+            this.modal.data.title_zh=tmp.zh_name;
+            this.modal.data.title_en=tmp.initial+''+tmp.level;
             this.modal.data.initial=tmp.initial;
             this.modal.data.level=tmp.level;
         },

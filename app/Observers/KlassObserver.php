@@ -58,21 +58,14 @@ class KlassObserver
         $data=[];
         foreach($subjects as $subject){
             $fields['klass_id']=$klass->id;
-            $fields['code']=$subject->code;
-            $fields['title_zh']=$subject->title_zh;
-            $fields['title_en']=$subject->title_en;
-            $fields['type']=$subject->type;
-            $fields['stream']=$subject->stream;
-            $fields['elective']=$subject->elective;
-            $fields['in_transcript']=$subject->in_transcript;
-            $fields['unit']=$subject->unit;
+            $fields['study_subject_id']=$subject->pivot->id;
             $fields['active']=true;
             $data[]=$fields;
         }
         Course::upsert(
             $data,
             ['klass_id','code'],
-            ['title_zh','title_en','type','stream','elective','in_transcript','unit','active']
+            []
         );
         $courses=Course::whereBelongsTo($klass)->get();
         $scoreTemplate=json_decode(Config::where('key','score_template')->first()->value);
