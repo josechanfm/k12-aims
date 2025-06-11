@@ -27,7 +27,7 @@
                             </div>
                             <div class="overflow-y-scroll  max-h-[600px]">
                                 <div class="font-base flex  border border-b border-t-0 border-l-0 border-r-0  border-gray-400 py-1" :key="idx" v-for="row,idx in $page.props.data.successes">
-                                    <div class="text-center w-1/3">{{ row.suid }}</div>
+                                    <div class="text-center w-1/3">{{ row.stud_id }}</div>
                                     <div class="w-1/3 text-center">{{ row.name_zh }}</div>
                                     <div class="w-1/3 text-center">{{ row.id_num }}</div>
                                 </div>

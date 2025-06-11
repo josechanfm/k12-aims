@@ -1,65 +1,189 @@
 <template>
     <AdminLayout title="個人信息" :breadcrumb="breadcrumb">
-        <div class="flex flex-wrap bg-white rounded-lg p-4 ">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight flex-1">
-                <div class="flex flex-wrap bg-white rounded-lg p-1 items-center gap-2">
-                    <div class="bg-gray-300/60 w-[3cm] h-[4cm] rounded-lg flex items-center justify-center">
-                        <div v-if="student.avatars[0] && student.avatars[0].image" >
-                            <a-image  width="2.4cm" height="3.2cm"  v-if="student.avatars && student.avatars[0]"
-                                :src="student.avatars[0].image.original_url" />
-                        </div>
-                        <div v-else>
-                            <a-avatar shape="square" :size="128">
-                                <template #icon><UserOutlined /></template>
-                            </a-avatar>                            
-                        </div>
-                    </div>
-                    <div class="flex gap-1 flex-col">
-                        <div class="profile-row">   
-                            <div class="profile-label ">中文姓名：</div>
-                            <div>{{ student.name_zh }}</div>
-                        </div>
-                        <div class="profile-row"> 
-                            <div  class="profile-label">外文姓名：</div>
-                            <div >{{ student.name_fn }}</div>
-                        </div>
-                        <div class="profile-row">
-                            <div  class="profile-label">性別：</div>
-                            <div >{{ student.gender }}</div>
-                        </div>
-                        <div class="profile-row"> 
-                            <div class="profile-label">出生日期(年齡)：</div>
-                            <div>{{ student.dob }} ({{ calculateAge(student.dob) }})</div>
-                        </div>
-                        <div class="profile-row"> 
-                            <div class="profile-label">歷年年級：</div>
-                            <div class='flex gap-1'>
-                                <a-tag class="font-black text-lg bg-green-200/90 text-green-700" v-for="klass in  student.klasses" :key="klass.school_year">{{ klass.school_year }}:{{ klass.tag }}</a-tag>
+        <div class="bg-gradient-to-br from-white to-blue-50 rounded-xl shadow-lg overflow-hidden border border-gray-100 transform transition-all duration-300 hover:shadow-xl">
+            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-4 flex items-center justify-between">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <UserOutlined /> 學生信息概覽
+                </h2>
+                <div class="flex items-center gap-3">
+                    <span class="text-white font-medium">編輯模式:</span>
+                    <a-switch 
+                    v-model:checked="isEdit" 
+                    @change="onChangeEditMode"
+                    checkedChildren="開啟" 
+                    unCheckedChildren="關閉"
+                    class="font-semibold"
+                    :class="isEdit ? 'bg-blue-200' : 'bg-gray-200'"
+                    />
+                </div>
+            </div>
+
+            <div class="p-5">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex-shrink-0 flex justify-center">
+                        <div class="bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl border-2 border-white shadow-md p-2 w-32 h-40 flex items-center justify-center overflow-hidden">
+                            <div v-if="student.avatars[0] && student.avatars[0].image" class="rounded-lg overflow-hidden">
+                                <a-image 
+                                    width="2.4cm" 
+                                    height="3.2cm"
+                                    :src="student.avatars[0].image.original_url" 
+                                    class="rounded-lg object-cover"
+                                    :preview="false"
+                                />
+                            </div>
+                            <div v-else>
+                                <a-avatar shape="square" :size="158" class="bg-indigo-100">
+                                    <template #icon><UserOutlined /></template>
+                                </a-avatar>
                             </div>
                         </div>
                     </div>
-                  
+
+                    <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-3 text-base">
+                            <div class="flex items-start">
+                                <div class="w-28 flex-shrink-0 text-indigo-700 font-medium flex items-center">
+                                    <i class="fas fa-signature mr-2"></i>中文姓名:
+                                </div>
+                                <div class="font-semibold text-gray-800 italic">{{ student.name_c || '未填寫' }}</div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                <div class="w-28 flex-shrink-0 text-indigo-700 font-medium flex items-center">
+                                    <i class="fas fa-passport mr-2"></i>外文姓名:
+                                </div>
+                                <div class="font-semibold text-gray-800 italic">{{ student.name_p || '未填寫' }}</div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 text-base">
+                            <div class="flex items-start">
+                                <div class="w-28 flex-shrink-0 text-indigo-700 font-medium flex items-center">
+                                    <i class="fas fa-venus-mars mr-2"></i>性别:
+                                </div>
+                                <div class="font-semibold text-gray-800">
+                                    <span v-if="student.sex === 'M'" class="text-blue-600">{{ student.sex }}</span>
+                                    <span v-else-if="student.sex === 'F'" class="text-pink-600">{{ student.sex }}</span>
+                                    <span v-else>{{ student.sex || '未填寫' }}</span>
+                                </div>
+                                </div>
+                                
+                                <div class="flex items-start">
+                                <div class="w-28 flex-shrink-0 text-indigo-700 font-medium flex items-center">
+                                    <i class="fas fa-birthday-cake mr-2"></i>出生日期:
+                                </div>
+                                <div class="font-semibold text-gray-800">
+                                    {{ student.b_date || '未填寫' }} 
+                                    <span class="ml-2 bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
+                                        ({{ calculateAge(student.b_date) }}歲)
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-2 mt-3 pt-3 border-t border-gray-200">
+                            <div class="flex items-start">
+                                <div class="w-28 flex-shrink-0 text-indigo-700 font-medium flex items-center">
+                                    <i class="fas fa-graduation-cap mr-2"></i>歷年年级:
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <a-tag 
+                                    v-for="(klass, index) in student.klasses" 
+                                    :key="index"
+                                    :color="getTagColor(index)"
+                                    class="px-3 py-1 rounded-full font-semibold shadow-sm transform transition-all duration-200 hover:scale-105"
+                                    >
+                                    {{ klass.school_year }} : {{ klass.tag }}
+                                    </a-tag>
+                                    <span v-if="!student.klasses || student.klasses.length === 0" class="text-gray-500 italic">
+                                    暫無年級信息
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </h2>
-            <div >
-                <a-switch class="font-semibold" v-model:checked="isEdit" @change="onChangeEditMode" checkedChildren="編輯中" unCheckedChildren="鎖定中"/>
+            </div>
+
+            <div class="flex items-center justify-end bg-gray-50 px-5 py-3 border-t border-gray-200 text-sm text-gray-500">
+                <RetweetOutlined />最後更新于: {{ new Date().toLocaleDateString() }}
             </div>
         </div>
+
         
         <div :class="isEdit ? 'formEditOn' : 'formEditOff'">
-            <div class='flex items-center p-2 bg-gray-200'>
-                <div class="font-black bg-gray-400/60 text-slate-500 p-2 px-2 rounded-l-3xl text-lg">顯示類型</div>  
-                <a-checkbox-group v-model:value="activeKeys" class="flex gap-1 bg-gray-300/30  p-1 rounded-r-2xl">
-                    <div  :key="ackey" v-for="ackey in Object.keys( header_zh )">
-                        <a-checkbox :value="ackey" 
-                         class="checkbox-btn ">{{ header_zh[ackey]??ackey }}</a-checkbox>
-                    </div>
-                </a-checkbox-group>
+            <div class="my-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl shadow-md p-3 border border-blue-100">
+                <div class="flex flex-col md:flex-row items-center gap-3">
+                <!-- 标题区域 -->
+                <div class="flex items-center bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-2 px-5 rounded-full shadow-lg min-w-max">
+                    <i class="fas fa-sliders-h mr-2"></i>
+                    <span class="font-bold text-lg">顯示類型</span>
+                </div>
+                
+                <!-- 选择器区域 -->
+                <div class="w-full py-4">
+                    <a-checkbox-group 
+                    v-model:value="activeKeys" 
+                    class="flex flex-wrap gap-2 h-auto xl:h-20 2xl:h-auto"
+                    >
+                    <transition-group name="fade" tag="div" class="flex flex-wrap gap-8 md:gap-4">
+                        <div v-for="(label, key) in header_zh" :key="key">
+                        <a-checkbox 
+                            :value="key" 
+                            class="hidden"
+                            :id="'checkbox-' + key"
+                        />
+                        <label 
+                            :for="'checkbox-' + key"
+                            class="option-btn cursor-pointer px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105"
+                            :class="{
+                            'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-md': activeKeys.includes(key),
+                            'bg-white text-gray-700 border border-gray-300 hover:border-blue-400': !activeKeys.includes(key)
+                            }"
+                        >
+                            <i 
+                            class="mr-2 text-xs" 
+                            :class="activeKeys.includes(key) ? 'fas fa-check-circle' : 'far fa-circle'"
+                            ></i>
+                            {{ label }}
+                        </label>
+                        </div>
+                    </transition-group>
+                    </a-checkbox-group>
+                </div>
+                
+                <!-- 操作按钮 -->
+                <div class="flex gap-2">
+                    <a-tooltip title="全選所有類型">
+                    <button 
+                        @click="selectAll"
+                        class="p-2 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
+                    >
+                        <CheckOutlined />
+                    </button>
+                    </a-tooltip>
+                    <a-tooltip title="清除所有選擇">
+                    <button 
+                        @click="deselectAll"
+                        class="p-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
+                    >
+                        <CloseOutlined />
+                    </button>
+                    </a-tooltip>
+                </div>
+                </div>
+                
+                <!-- 计数器 -->
+                <div class="mt-3 text-right text-sm text-gray-500">
+                <span class="bg-blue-500 text-white px-2 py-1 rounded-full">
+                    已選擇: {{ activeKeys.length }}/{{ Object.keys(header_zh).length }}
+                </span>
+                </div>
             </div>
             <a-form ref="formRef" name="advanced_search" class="ant-advanced-search-form" :model="student"
                  :labelWrap='true'	  label-align="right"
                 :rules="rules" @finish="onFinish" @finishFailed="onFinishFailed">
-                <div  class="flex flex-col gap-2 bg-white p-2">
+                <div class="flex flex-col gap-2 bg-white p-2">
                     <transition-group name="list">
                     <div class="ant-form-bg" key="avatar" header=""  v-if='activeKeys.includes("avatar")  ||  activeKeys.includes("all")' >
                         <div class="form-header">頭像照片</div>
@@ -401,7 +525,7 @@
 <script>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Link } from '@inertiajs/vue3';
-import { UserOutlined } from '@ant-design/icons-vue';
+import { UserOutlined, RetweetOutlined,CheckOutlined,CloseOutlined } from '@ant-design/icons-vue';
 import UploadAvatars from "../../Components/UploadAvatars.vue";
 
 
@@ -409,12 +533,15 @@ export default {
     components: {
         UploadAvatars,
         AdminLayout, Link,
-        UserOutlined
+        UserOutlined,
+        RetweetOutlined,
+        CheckOutlined,
+        CloseOutlined
     },
     props: ['student'],
     data() {
         return {
-            header_zh:{'all':'全','avatar':'頭像照片','basic':'基本信息','id_card':'證件信息','detail':'補充信息',
+            header_zh:{'avatar':'頭像照片','basic':'基本信息','id_card':'證件信息','detail':'補充信息',
                         'address':'住址信息','bank':'銀行信息','parent':'父母信息','guardian':'監護人信息','health':'健康信息','siblings':'本校兄弟姊妹'},
             breadcrumb: [
                 { label: "主控台", url: route('director.dashboard') },
@@ -476,8 +603,7 @@ export default {
         }
        
     },
-    methods: {
-       
+    methods: {     
         init(){
             if (this.student.address == null) this.student.address = {}
             if (this.student.identity_document == null) this.student.identity_document = {}
@@ -541,8 +667,13 @@ export default {
           let difference = currentDate - birthDate;
           let age = Math.floor(difference/31557600000);
           return age
+        },
+        selectAll(){
+            this.activeKeys = Object.keys(this.header_zh);
+        },
+        deselectAll() {
+            this.activeKeys = [];
         }
-
 
     },
 }

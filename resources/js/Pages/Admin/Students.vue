@@ -40,10 +40,10 @@
                 :wrapper-col="{ span: 20 }"
             >
                 <a-form-item label="中文姓名" name="name_zh">
-                    <a-input v-model:value="modal.data.name_zh" />
+                    <a-input v-model:value="modal.data.name_c" />
                 </a-form-item>
                 <a-form-item label="外文姓名" name="name_fn">
-                    <a-input v-model:value="modal.data.name_fn" />
+                    <a-input v-model:value="modal.data.name_p" />
                 </a-form-item>
                 <a-form-item label="性別" name="gender">
                     <a-radio-group v-model:value="modal.data.gender" button-style="solid">
@@ -107,13 +107,13 @@ export default {
             columns:[
                 {
                     title: '姓名(中文)',
-                    dataIndex: 'name_zh',
+                    dataIndex: 'name_c',
                 },{
                     title: '姓名(外文)',
-                    dataIndex: 'name_fn',
+                    dataIndex: 'name_p',
                 },{
                     title: '性別',
-                    dataIndex: 'gender',
+                    dataIndex: 'sex',
                 },{
                     title: '教師',
                     dataIndex: 'is_teacher',

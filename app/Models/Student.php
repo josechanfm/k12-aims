@@ -15,20 +15,81 @@ class Student extends Model implements HasMedia
     use HasFactory;
     use InteractsWithMedia;
     protected $hidden = ['created_at','updated_at'];
-    protected $fillable=['suid','name_zh','name_fn','name_display','gender','dob','pob','pob_other','nationality','native','religion',
-    'sid','id_num','id_type','id_type_other','id_issue','id_expired','hrc_num','hrc_issue','hrc_expired','dsedj_num','ssm_num',
-    'entry_date','previour_school','previour_grade','start_klass',
-    'phone','phone_sms','phone_home'
+
+    protected $fillable = [
+        'stud_id',
+        'code',
+        'name_c',
+        'name_p',
+        'sex',
+        'b_date',
+        'b_place',
+        'id_type',
+        'id_no',
+        'i_place',
+        'i_date',
+        'v_date',
+        's6_type',
+        's6_idate',
+        's6_vdate',
+        'nation',
+        'origin',
+        'tel',
+        'mobile',
+        'area',
+        'postal_code',
+        'road',
+        'address',
+        'sleep_same',
+        'r_area',
+        'ra_desc',
+        's_road',
+        's_address',
+        'father',
+        'mother',
+        'f_prof',
+        'm_prof',
+        'guard',
+        'live_same',
+        'ec_name',
+        'ec_rel',
+        'ec_tel',
+        'ec_area',
+        'ec_postal_code',
+        'ec_road',
+        'ec_address',
+        's_code',
+        'grade',
+        'class',
+        'c_no',
+        'g_name',
+        'g_relation',
+        'g_profession',
+        'g_area',
+        'g_postal_code',
+        'g_road',
+        'g_address',
+        'g_tel',
+        'guardmobile'
+    ];
+    
+    // 建議添加的日期轉換和類型轉換
+    protected $dates = [
+        'B_DATE',
+        'I_DATE',
+        'V_DATE',
+        'S6_IDATE',
+        'S6_VDATE'
     ];
 
     public static function boot(){
         parent::boot();
         self::creating(function($model){
-            $model->suid=Str::uuid();
+            $model->stud_id=Str::uuid();
         });
         static::created(function($model){
             $num=substr('00000'.$model->id,-5);
-            $model->suid=Config::item('suid_prefix').$num.'-'.$model->checkDigit($num);
+            $model->stud_id=Config::item('suid_prefix').$num.'-'.$model->checkDigit($num);
             $model->save();
         });
     }
