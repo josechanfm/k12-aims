@@ -23,6 +23,7 @@
                     <div>{{ year.end }}</div>
                 </div>
                 <div class="flex-1"></div>
+                <a-button @click="syncGradeKlass">admin.klass.syncGradeKlass</a-button>
                 <a-button @click="createRecord()" type="create" size="small">
                     新增學年級別＋
                 </a-button>
@@ -59,18 +60,20 @@
                 <a-table-column title="已開設班別" >
                     <template #default="{record}">
                         <div  v-if="getGrade(record)">
-                            <a-tag color="blue" :key="letter"    
-                            v-for="(letter) in  getGrade(record).student_count">
-                                {{letter}}
+                            <a-tag color="blue" :key="klass.letter"    
+                            v-for="(klass) in  getGrade(record).klasses">
+                                {{klass.letter}} : {{ klass.student_count }}人
                             </a-tag>
                         </div>
                     </template>
                 </a-table-column>
                 <a-table-column title="操作">
                     <template #default="{record}">
-                            <a-button  v-if="getGrade(record)" 
+                        <div class="flex gap-1" v-if="getGrade(record)">
+                            <a-button @click="editRecord(getGrade(record))" size="small" type="edit">修改</a-button>
+                            <a-button   
                                 @click="deleteRecord(getGrade(record))" size="small" type="delete">刪除</a-button>
-                            
+                        </div>
                     </template>
                 </a-table-column>
                 <!-- <template #bodyCell="{column, text, record, index}">
@@ -248,6 +251,18 @@ export default {
     },
     methods: {
         ///
+        syncGradeKlass(){
+             this.$inertia.post(route('admin.klass.syncGradeKlass', this.year.id),{},{
+                preserveScroll:true,
+                onSuccess:(page)=>{
+                    console.log(page);
+                    this.modal.isOpen=false;
+                },
+                onError:(error)=>{
+                    console.log(error);
+                }
+            });
+        },
         getGrade(record){
             return  this.grades.find(x=>x.grade_year==record.value) 
         },

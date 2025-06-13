@@ -66,6 +66,8 @@ class GradeSeeder extends Seeder
         //primary
         for($i=4;$i<=9;$i++){
             $grade=Grade::firstOrCreate([
+                    'title_zh'=>'P'.$i,
+                    'title_en'=>'P'.$i,
                     'year_id'=>$year->id,
                     'grade_year'=>$i,
                     'initial'=>'P',
@@ -101,6 +103,8 @@ class GradeSeeder extends Seeder
         //secondary junior
         for($i=10;$i<=12;$i++){
             $grade=Grade::firstOrCreate([
+                    'title_zh'=>'SC'.$i,
+                    'title_en'=>'SC'.$i,
                     'year_id'=>$year->id,
                     'grade_year'=>$i,
                     'initial'=>'SC',
@@ -135,6 +139,8 @@ class GradeSeeder extends Seeder
         //secondary senior
         for($i=13;$i<=15;$i++){
             $grade=Grade::firstOrCreate([
+                    'title_zh'=>'SG'.$i,
+                    'title_en'=>'SG'.$i,
                     'year_id'=>$year->id,
                     'grade_year'=>$i,
                     'initial'=>'SG',

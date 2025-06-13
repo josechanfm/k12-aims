@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('klass_id')->constrained('klasses')->onDelete('restrict')->onUpdate('restrict');
+            $table->foreignId('klass_id')->constrained('klasses')->onDelete('cascade')->onUpdate('restrict');
             $table->foreignId('study_subject_id')->constrained('study_subject')->onDelete('restrict')->onUpdate('restrict');
             // $table->string('code');
             // $table->string('title_zh');

@@ -91,8 +91,10 @@ Route::group([
     ]
 ],function () {
         Route::resource('/studies',App\Http\Controllers\Master\StudyController::class)->names('master.studies');
+        /*new 2025-6-10*/
         Route::post('/study_subject/sortOrderSubject/{study}',[App\Http\Controllers\Master\StudySubjectController::class,'sortOrderSubject'])->name('master.studySubjects.sortOrder');
         Route::resource('/study_subjects',App\Http\Controllers\Master\StudySubjectController::class)->names('master.studySubjects');
+        //
         Route::resource('/subjects',App\Http\Controllers\Master\SubjectController::class)->names('master.subjects');
         Route::resource('/configs',App\Http\Controllers\Master\ConfigController::class)->names('master.configs');
         Route::resource('/transcriptTemplate',App\Http\Controllers\Master\TranscriptTemplateController::class)->names('master.transcriptTemplate');
@@ -131,6 +133,9 @@ Route::group([
     Route::resource('klass/{klass}/themes',App\Http\Controllers\Admin\ThemeController::class)->names('admin.klass.themes');
     Route::resource('klass/{klass}/topics',App\Http\Controllers\Admin\TopicController::class)->names('admin.klass.topics');
     Route::resource('klass/{klass}/courses',App\Http\Controllers\Admin\CourseController::class)->names('admin.klass.courses');
+    ///
+    Route::post('/klass/syncGradeKlass/{year}',[App\Http\Controllers\Admin\KlassController::class,'syncGradeKlass'])->name('admin.klass.syncGradeKlass');
+    ///
     Route::post('student/sync_courses',[App\Http\Controllers\Admin\StudentController::class,'syncCourses'])->name('admin.klass.syncCourses');
 
     Route::put('course/{course}/update_curse_teachers',[App\Http\Controllers\Admin\CourseController::class,'updateCourseTeachers'])->name('admin.course.updateCourseTeachers');

@@ -27,6 +27,8 @@ return new class extends Migration
             $table->boolean('course_locked')->default(false);
             $table->boolean('transcript_locked')->default(false);
             $table->timestamps();
+            $table->unique(['grade_id','letter'],'grade_id_letter');
+
         });
     }
 

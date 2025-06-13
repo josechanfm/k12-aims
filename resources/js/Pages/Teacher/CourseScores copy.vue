@@ -79,15 +79,12 @@
         </div>
     </Transition>
     
+
     <div class="mx-auto flex flex-col gap-1 ">
-        
-        <ScoreTable :column="scoreColumns" :score="Object.values(studentsScores)"/>
-        
         <div class="flex">   
-            <a-button type="primary" @click="storeAllScores" :disabled="disabledByTerm()">更新並保存</a-button>
-            <a-button @click="sampleData" :disabled="disabledByTerm()">Sample Data</a-button>
-        </div>
-            
+                <a-button type="primary" @click="storeAllScores" :disabled="disabledByTerm()">更新並保存</a-button>
+                <a-button @click="sampleData" :disabled="disabledByTerm()">Sample Data</a-button>
+             </div>
         <div class="bg-white p-1 rounded-lg shadow-lg">
             <div class="border border-solid border-stone-400 rounded-lg overflow-hidden">
                 <table id="dataTable" ref="dataTable">
@@ -196,9 +193,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import ScoreTable from '@/Components/ScoreTable.vue';
 import {
     ContactsOutlined,HolderOutlined
 } from '@ant-design/icons-vue';
@@ -211,7 +206,6 @@ import {
 
 export default {
     components: {
-        ScoreTable,
         AdminLayout,HolderOutlined,
         draggable: VueDraggableNext,
     },
@@ -336,7 +330,7 @@ export default {
             this.modal.data.course_id = this.course.id;
             this.modal.data.type = 'SUB';
             this.modal.data.term_id = this.selectedTerm;
-            this.modal.data.merge = null;
+            this.modal.data.merge = [];
             this.modal.title = "Add Score Column";
             this.modal.mode = 'ADD';
             this.modal.isOpen = true;
@@ -344,8 +338,7 @@ export default {
         onClickEditScoreColumn(record) {
             this.modal.data = record;
             if (record.merge == null || record.merge == '') {
-                // merge default
-                this.modal.data.merge = null;
+                this.modal.data.merge = [];
             } else if (!Array.isArray(record.merge)) {
                 this.modal.data.merge = record.merge;
             }

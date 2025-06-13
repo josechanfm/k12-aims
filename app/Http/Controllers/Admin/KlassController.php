@@ -201,5 +201,31 @@ class KlassController extends Controller
     //     ]);
     // }
     
-
+    function syncGradeKlass(Request $request,$yearId){
+        $klassLetters=Config::item('klass_letters');
+        $year=Year::where('id',$yearId)->with(['grades','studies'])->first();
+         foreach($year->grades as $grade){
+             $studiesObj=[];
+             if( $year->studies){
+                $studiesObj=array_column(  $year->studies->toArray(),'id','grade_year');
+            }
+            foreach(  array_slice( $klassLetters,0,$grade->klass_count??0 ) as $letter ){
+                 $grade->klasses()->updateOrCreate(
+                    ['letter' =>$letter->label], 
+                    [ 'study_id'=>$studiesObj[$grade->grade_year]??null ,
+                        'tag'=>$grade->title_en.$letter->label, 'by_name'=>$grade->title_zh.$letter->value    ]
+                );
+            }
+         }
+         //delete klasses
+        $year=Year::where('id',$yearId)->with(['grades','grades.klasses'])->first();
+         foreach($year->grades as $grade ){
+            foreach($grade->klasses as $klass){
+                $letters= array_column(array_slice( $klassLetters,0,$grade->klass_count??0 ),'label' ) ;
+                  if( !in_array( $klass->letter,$letters) && $klass->student_count==0){
+                        $klass->delete();
+                  }
+            }
+         }
+    }
 }
