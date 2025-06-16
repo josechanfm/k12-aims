@@ -21,7 +21,6 @@ class ScoreController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function byCourse(Course $course){
-
         $studentsScores=$course->studentsScores();
         $scoreColumns=$course->scoreColumns;
         // dd($scoreColumns);

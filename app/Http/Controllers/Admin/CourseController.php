@@ -17,16 +17,17 @@ class CourseController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Klass $klass)
-    {
-        $courses=Course::whereBelongsTo($klass)->with('staffs')->get();
-        return Inertia::render('Admin/KlassCourses',[
-            'yearTerms'=>Config::item('year_terms'),
-            'klass'=>$klass,
-            'courses'=>$courses,
-            'teachers'=>Staff::all()
-            //'subjects'=>$subjects
-        ]);
+    public function index(Klass $klass) //don't use
+    {   
+        echo "non using...";
+        // $courses=Course::whereBelongsTo($klass)->with('staffs')->get();
+        // return Inertia::render('Admin/KlassCourses',[
+        //     'yearTerms'=>Config::item('year_terms'),
+        //     'klass'=>$klass,
+        //     'courses'=>$courses,
+        //     'teachers'=>Staff::all()
+        //     //'subjects'=>$subjects
+        // ]);
 
     }
 

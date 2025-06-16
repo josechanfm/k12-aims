@@ -39,7 +39,6 @@ class ScoreController extends Controller
         $this->authorize('scores',$course);
         $klassCourses=Klass::find($course->klass_id)->courses;
         $course=Course::with('klass')->find($course->id);
-        
         //dd($course, $klassCourses, $course->scoreColumns,$course->studentsScores());
         return Inertia::render('Teacher/CourseScores',[
             'yearTerms'=>Config::item('year_terms'),
@@ -118,9 +117,14 @@ class ScoreController extends Controller
     }
 
     public function batchUpdate(Course $course, Request $request){
-        $data=$request->all();
-        $updatedCount=Score::updateScore($data);
-        $course->upsertMergeScoreColumn();
+        $data = $request->all();
+        // dd($data);
+        foreach( $data as $student){
+            // dd($student['scores']);
+            $updatedCount=Score::updateScore($student['scores']);
+        }
+        // $updatedCount=Score::updateScore($data);
+        // $course->upsertMergeScoreColumn();
         return redirect()->back();
 
     }

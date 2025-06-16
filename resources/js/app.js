@@ -1,5 +1,6 @@
 import './bootstrap';
 import '../css/app.css';
+
 import { createApp, h, hydrate } from 'vue';
 import { createInertiaApp, Head, Link } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
@@ -11,6 +12,7 @@ import Antd from 'ant-design-vue';
 //import 'ant-design-vue/dist/antd.css';
 import 'ant-design-vue/dist/reset.css';
 import '/resources/css/app.css';
+// import '../../node_modules/tabulator-tables/dist/css/tabulator.css';
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 

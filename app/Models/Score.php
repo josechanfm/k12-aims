@@ -22,15 +22,16 @@ class Score extends Model
         return $this->belongsToMany(Student::class,'klass_student','student_id','klass_id');
     }
     static function updateScore($data){
+       
         foreach( $data as $i=>$d){
-            if($d['point']==''){ // unsert record if point value is empty
+            if( is_null($d['point']) || $d['point']=='' ){ // unsert record if point value is empty
                 unset($data[$i]);
             }
         }
+        dd($data);
         Score::upsert(
             $data,
-            ['course_student_id','score_column_id'],
-            ['point']
+            ['course_student_id','score_column_id','student_id']
         );
         
         // check and proceed merge course scores

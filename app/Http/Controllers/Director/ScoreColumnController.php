@@ -40,7 +40,7 @@ class ScoreColumnController extends Controller
      */
     public function store(Course $course, Request $request)
     {
-        //dd($request->all());
+        // dd($request->all());
         $letter=ScoreColumn::where('course_id',$request->course_id)->orderBy('column_letter','DESC')->first()->column_letter;
         $data=$request->all();
         $data['field_name']=Str::uuid();

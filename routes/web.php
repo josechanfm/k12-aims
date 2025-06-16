@@ -139,10 +139,10 @@ Route::group([
     Route::post('student/sync_courses',[App\Http\Controllers\Admin\StudentController::class,'syncCourses'])->name('admin.klass.syncCourses');
 
     Route::put('course/{course}/update_curse_teachers',[App\Http\Controllers\Admin\CourseController::class,'updateCourseTeachers'])->name('admin.course.updateCourseTeachers');
-    
-    Route::get('/klasses',[App\Http\Controllers\Admin\KlassController::class,'list'])->name('admin.klasses');
+    ///
+    Route::resource('/klasses',App\Http\Controllers\Admin\KlassController::class)->names('admin.klasses');
     Route::get('/grades',[App\Http\Controllers\Admin\GradeController::class,'list'])->name('admin.grades');
-
+    ///
     Route::resource('/courses',App\Http\Controllers\Admin\CourseController::class)->names('admin.courses');
     Route::resource('/students',App\Http\Controllers\Admin\StudentController::class)->names('admin.students');
     Route::get('/transcript/lock',[App\Http\Controllers\Admin\TranscriptController::class,'lockTranscripts'])->name('admin.lockTranscripts');
@@ -173,6 +173,7 @@ Route::group([
 
         Route::resource('grades',App\Http\Controllers\Director\GradeController::class)->names('director.grades');
         Route::resource('course',App\Http\Controllers\Director\CourseController::class);
+        Route::resource('course_staff',App\Http\Controllers\Director\CourseStaffController::class)->names('director.courseStaff');
         Route::get('/course/{course}/makeups',[App\Http\Controllers\Director\CourseController::class,'makeups'])->name('director.course.makeups');
         Route::get('/klass/{klass}/courses',[App\Http\Controllers\Director\CourseController::class,'klass'])->name('director.klass.courses');
 

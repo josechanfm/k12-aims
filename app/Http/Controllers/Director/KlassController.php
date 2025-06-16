@@ -10,6 +10,7 @@ use App\Models\Year;
 use App\Models\Klass;
 use App\Models\Student;
 use App\Models\Transcript;
+use App\Models\Staff;
 use App\Models\AdditiveTemplate;
 
 class KlassController extends Controller
@@ -66,7 +67,8 @@ class KlassController extends Controller
             'klass' => $klass,
             'additiveTemplates'=>AdditiveTemplate::all(),
             'additiveStyle'=>Config::item('additive_styles'),
-            'additiveGroups'=>Config::item('additive_groups')
+            'additiveGroups'=>Config::item('additive_groups'),
+            'teachers'=>Staff::teachers()
         ]);
     }
 

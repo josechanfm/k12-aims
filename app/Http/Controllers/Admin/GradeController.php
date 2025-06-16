@@ -45,6 +45,7 @@ class GradeController extends Controller
         }
         ///
         ///
+        // dd($grades->toArray());
         return Inertia::render('Admin/YearGrades',[
             'years'=>Year::where('active',true)->get(),
             'year'=>$year,

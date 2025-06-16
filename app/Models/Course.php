@@ -8,9 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class Course extends Model
 {
     use HasFactory;
-    protected $fillable=['klass_id','code','title_zh','title_en','type','stream','elective','description','score_column','score_scheme','in_transcript','unit','active','subject_head_ids','transcript_locked'];
-    protected $appends=['student_count','subject_heads','teacher_ids','teaching'];
-    protected $casts=['subject_head_ids'=>'array'];
+    protected $fillable=['klass_id','code','title_zh','title_en','type','stream','elective','description','score_column','score_scheme','in_transcript','unit','active','transcript_locked'];
+    protected $appends=['student_count','subject_heads','teacher_ids','teaching','study_subject'];
+    // protected $casts=['subject_head_ids'=>'array'];
+
+      public function studySubject()
+    {
+        return $this->belongsTo(StudySubject::class);
+    }
+    public function getStudySubjectAttribute()
+    {
+        return $this->studySubject()->with('subject')->first();
+    }
 
     public function getTeacherIdsAttribute(){
         return $this->staffs->pluck('id');
@@ -24,8 +33,8 @@ class Course extends Model
         return $this->students->count();
     }
     public function getSubjectHeadsAttribute(){
-        if(is_array($this->subject_head_ids)){
-            return Staff::whereIn('id',$this->subject_head_ids)->get();
+        if(is_array($this->study_subject->subject_head_ids)){
+            return Staff::whereIn('id',$this->study_subject->subject_head_ids)->get();
         };
         return null;
     }
@@ -39,7 +48,8 @@ class Course extends Model
         if(empty(auth()->user()->staff)){
             return false;
         }
-        return in_array(auth()->user()->staff->id,$this->subject_head_ids);
+        
+        return in_array(auth()->user()->staff->id,$this->study_subject->subject_head_ids);
     }
     public function isKlassHead(){
         if(empty(auth()->user()->staff)){
@@ -74,7 +84,7 @@ class Course extends Model
         return $this->belongsToMany(Student::class,'course_student')->withPivot('id as pivot_course_student_id');
     }
     public function teachers(){
-        return $this->belongsToMany(Staff::class,'course_teacher','course_id','staff_id')->withPivot(['behaviour','behaviour_exception']);
+        return $this->belongsToMany(Staff::class,'course_staff','course_id','staff_id')->withPivot(['behaviour','behaviour_exception']);
     }
     public function staffs(){
         return $this->belongsToMany(Staff::class)->withPivot(['behaviour','behaviour_exception']);
@@ -109,7 +119,7 @@ class Course extends Model
         foreach($students as $student){
             $tmp=[];
             $tmp['student_id']=$student->id;
-            $tmp['student_name']=$student->name_zh;
+            $tmp['student_name']=$student->name_c;
             $tmp['course_student_id']=$student->pivot->course_student_id;
             $tmp['student_number']=KlassStudent::where('klass_id',$this->klass_id)->where('student_id',$student->id)->pluck('student_number')->first();
 
@@ -117,8 +127,8 @@ class Course extends Model
                 $tmp['scores'][$column->id]=[];
                 foreach($scores as $score){
                     if($score->course_student_id==$tmp['course_student_id'] && $score->score_column_id==$column->id){
-                        $score['column_letter']=$column->column_letter;
-                        $score['old_point']=$score->point;
+                        // $score['column_letter']=$column->column_letter;
+                        // $score['old_point']=$score->point;
                         $tmp['scores'][$score->score_column_id]=$score;
                     }
                 }

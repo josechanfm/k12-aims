@@ -60,8 +60,8 @@
         <p>&nbsp;</p>
 
         <div class="relative overflow-x-auto">
-            <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <table class="w-full text-sm text-left rtl:text-right text-gray-500 ">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 ">
                     <tr>
                         <th scope="col" class="px-6 py-3">科目代號</th>
                         <th scope="col" class="px-6 py-3">科目名稱</th>
@@ -76,7 +76,8 @@
                 </thead>
                 <tbody>
                     <template v-for="(course, courseKey) in klass.courses" :course_id="course.id">
-                        <tr class="bg-white dark:bg-gray-800">
+                        <tr class="bg-white ">
+                            <!-- {{ course }} -->
                             <td class="px-6 py-4">{{ course.code }}</td>
                             <td class="px-6 py-4">{{ course.title_zh }}</td>
                             <td class="px-6 py-4">{{ course.stream }}</td>
@@ -89,9 +90,18 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                <ol>
-                                    <li v-for="staff in course.staffs">{{ staff.name_zh }}</li>
-                                </ol>
+                                <div v-if="editingTeachingStaffs.course_id == course.id">
+                                    <a-select  v-model:value="editingTeachingStaffs.staff_ids" class="!min-w-32 !w-64" placeholder="請選擇..."
+                                        max-tag-count="responsive" :options="teachers" mode="multiple"
+                                        :field-names="{ value: 'id', label: 'name_zh'  }"></a-select>
+                                    <a-button class="bg-green-300" size="small" @click="saveTeachingStaffs">保存</a-button>    
+                                    <a-button size="small" @click="editingCancel()">取消</a-button>    
+                                </div>
+                                <div class="flex gap-2 items-center " v-else>
+                                    <!-- {{ course.staffs }} -->
+                                    <div v-for="staff in course.staffs">{{ staff.name_zh }}</div>
+                                    <a-button size="small" @click="editTeachingStaffs(course)">修改</a-button>
+                                </div>
                             </td>
                             <td class="px-6 py-4">{{ course.current_term }}</td>
                             <th scope="col" class="px-6 py-3">
@@ -117,7 +127,7 @@ export default {
     components: {
         AdminLayout
     },
-    props: ['currentTerm','klass','additiveTemplates','additiveStyle','additiveGroups'],
+    props: ['currentTerm','klass','additiveTemplates','additiveStyle','additiveGroups', 'teachers'],
     data() {
         return {
             breadcrumb:[
@@ -125,15 +135,40 @@ export default {
                 {label:"年級班別", url:route('director.grades.index',{'type':'secondary'})},
                 {label:this.klass.grade.initial+'年級' ,url:null},
             ],
-            course: {}
+            course: {},
+            editingTeachingStaffs:{},
         }
     },
     mounted() {
+        this.editingCancel()
     },
     methods: {
         showModal(){
             console.log('showmodal')
             this.modal.isOpen=true
+        },
+        editingCancel(){
+            this.editingTeachingStaffs = {}
+            this.editingTeachingStaffs.staff_ids = []
+        },
+        editTeachingStaffs(course){
+            // Reset
+            this.editingCancel()
+            this.editingTeachingStaffs.staff_ids = course.staffs.map( x => x.id ) ?? []
+            this.editingTeachingStaffs.course_id = course.id 
+        },
+        saveTeachingStaffs(){
+
+            this.$inertia.post(route('director.courseStaff.store'), this.editingTeachingStaffs, {
+                preserveScroll: true,
+                preserveState: true,    
+                onSuccess: (page) => {
+                    this.editingCancel()
+                },
+                onError: (err) => {
+                    this.editingCancel()
+                }
+            });
         },
         handleOk() {
 

@@ -49,6 +49,7 @@ class KlassObserver
             return true;
         }
         //如果沒有學習計劃
+      
         if(empty($klass->study_id)){
             return false;
         };

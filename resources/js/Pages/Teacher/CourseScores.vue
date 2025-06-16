@@ -81,7 +81,7 @@
     
     <div class="mx-auto flex flex-col gap-1 ">
         
-        <ScoreTable :column="scoreColumns" :score="Object.values(studentsScores)"/>
+        <ScoreTable :column="scoreColumns" :score="Object.values(studentsScores)" @store="storeAllScores"/>
         
         <div class="flex">   
             <a-button type="primary" @click="storeAllScores" :disabled="disabledByTerm()">更新並保存</a-button>
@@ -400,24 +400,27 @@ export default {
         onModalFinish() {
             console.log("modal finish");
         },
-        storeAllScores() {
+        storeAllScores(score) {
+            
             var data = [];
-            Object.entries(this.studentsScores).forEach(([sid, student]) => {
-                this.onScoreCellChange(student);
-                Object.entries(student.scores).forEach(([cid, score]) => {
-                    data.push({
-                        course_student_id: score.course_student_id,
-                        score_column_id: score.score_column_id,
-                        student_id: student.student_id,
-                        point: score.point
-                    })
-                })
-            })
-            this.$inertia.post(route("teacher.course.scores.batchUpdate", this.course), data, {
+            // Object.entries(this.studentsScores).forEach(([sid, student]) => {
+            //     this.onScoreCellChange(student);
+            //     Object.entries(student.scores).forEach(([cid, score]) => {
+            //         data.push({
+            //             course_student_id: score.course_student_id,
+            //             score_column_id: score.score_column_id,
+            //             student_id: student.student_id,
+            //             point: score.point
+            //         })
+            //     })
+            // })
+            // console.log(data);return ;
+            
+            this.$inertia.post(route("teacher.course.scores.batchUpdate", this.course), score, {
                 preserveScroll:true,
                 preserveState:true,
                 onSuccess: (page) => {
-                    console.log("update " + page)
+                    // console.log("update " + page)
                 },
                 onError: (error) => {
                     console.log(error);

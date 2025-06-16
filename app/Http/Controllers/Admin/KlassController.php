@@ -18,29 +18,47 @@ use Illuminate\Support\Facades\Validator;
 
 class KlassController extends Controller
 {
-    public function list(){
-        $grade=Grade::with('year')->whereBelongsTo(Year::currentYear())->first();
-        return redirect()->route('admin.grade.klasses.index',$grade);
+    // public function list(){
+    //     $grade=Grade::with('year')->whereBelongsTo(Year::currentYear())->first();
+    //     return redirect()->route('admin.grade.klasses.index',$grade);
 
-    }
+    // }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(Grade $grade){
-        $grade->year;
-        $grades=Grade::where('year_id',$grade->year_id)->get();
-        $klasses=Klass::with('grade')->whereBelongsTo($grade)->get();
-        $studies=Study::where('active',1)->get();
+    public function index(){
+        $gradeYear=$_GET['gradeYear']?? 4;
+        $year=Year::currentYear();
+        $grades=$year->grades()->with(['year'])->get();
+        $klasses=[];
+        collect( $grades)->each(function($grade)use($gradeYear,&$klasses){
+               if( $grade->grade_year!=$gradeYear){
+                    return true;
+                }
+                 $klasses=$grade->klasses;
+                collect( $grade->klasses)->each(function($klass)use(&$klasses){
+                   $klass->courses;
+                    collect( $klass->courses)->each(function($course){
+                   $course->subject;
+                });
+                });
+        });
+        // dd($klasses->toArray());
+        //echo json_encode($grades->toArray());die();
+        //$klasses=$year->grades()->where('grade_year',$gradeYear)->with(['klasses','klasses.courses'])->get();
+        //dd([$klasses->toArray(),$grades->toArray(),$year->toArray()]);
+        // $studies=Study::where('active',1)->get();
         return Inertia::render('Admin/GradeKlasses',[
+            'year'=>$year,
             'yearTerms'=>Config::item('year_terms'),
-            'grade'=>$grade,
             'grades'=>$grades,
             'klasses'=>$klasses,
             'klassLetters'=>Config::item('klass_letters'),
             'studyStreams'=>Config::item('study_streams'),
-            'studies'=>$studies,
+            'gradeYear'=>$gradeYear,
+            // 'studies'=>$studies,
             'teachers'=>Staff::teachers()
         ]);        
 
