@@ -108,6 +108,10 @@ class CourseController extends Controller
     //     dd($klass);
     // }
 
+    public function klass(Klass $klass){
+        return $klass->courses;
+    }
+
     public function makeups(Course $course){
         // dd($course->studentsMakeups());
         $course->klass; 

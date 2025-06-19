@@ -231,7 +231,9 @@ class KlassController extends Controller
                  $grade->klasses()->updateOrCreate(
                     ['letter' =>$letter->label], 
                     [ 'study_id'=>$studiesObj[$grade->grade_year]??null ,
-                        'tag'=>$grade->title_en.$letter->label, 'by_name'=>$grade->title_zh.$letter->value    ]
+                    'tag'=>$grade->tag.$letter->label,
+                    'name_zh'=>$grade->title_en.$letter->label ,
+                    'name_zh'=>$grade->title_zh.$letter->value    ]
                 );
             }
          }

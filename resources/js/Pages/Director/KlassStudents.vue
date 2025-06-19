@@ -4,7 +4,7 @@
 
         <a-button as="link" :href="route('teacher.klass.avatars',klass.id)" class="ant-btn ant-btn-default float-right">學生照片</a-button>
         <a-typography-title :level="3">班別: {{ klass.tag }}</a-typography-title>
-        <a-table :dataSource="students" :columns="columns">
+        <a-table :dataSource="students" :columns="columns" :pagination='false' size="small">
             <template #bodyCell="{column, text, record, index}">
                 <template v-if="column.dataIndex == 'action'">
                     <a-button as="link" :href="route('director.klass.student.transcript',record.pivot.klass_student_id)" class="ant-btn">Gen成績表</a-button>
@@ -42,10 +42,10 @@ export default {
             columns:[
             {
                     title: '姓名(中文)',
-                    dataIndex: 'name_zh',
+                    dataIndex: 'name_c',
                 },{
                     title: '姓名(外文)',
-                    dataIndex: 'name_fn',
+                    dataIndex: 'name_p',
                 },{
                     title: '性別',
                     dataIndex: 'gender',

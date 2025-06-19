@@ -1,6 +1,5 @@
 <template>
 <AdminLayout>
-    {{ klasses[0] }}
     <div>
         <div class="bg-white py-3 shadow-sm">
             <div class="container mx-auto px-6">
@@ -54,14 +53,14 @@
         <div class="flex-1 bg-gray-100">
             <div class="container mx-auto px-2 py-2 h-full">
                 <div class="bg-white rounded-xl shadow-lg h-full overflow-hidden">
-                    <div class="horizontal-container">
+                    <div class="horizontal-container grid grid-cols-4">
                         
                         <!-- 班级选择区 -->
-                        <div class="section-container" :class="{'active-section': currentSection === 1}">
+                        <div class="section-container " :class="{'active-section': currentSection === 1}">
                             <div class="p-6 h-full flex flex-col">
                                 <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
                                     <SearchOutlined class="mr-2 text-indigo-600"/> 选择班级
-                                    <span class="ml-auto text-sm text-gray-500">{{ classes.length }} 班级</span>
+                                    <!-- <span class="ml-auto text-sm text-gray-500">{{ classes.length }} 班级</span> -->
                                 </h2>
 
                                 <div class="mb-4 ">
@@ -72,7 +71,7 @@
                                 </div>
 
                                 <div class="flex-1 overflow-y-auto custom-scrollbar">
-                                    <div v-for="kls in klasses" :key="kls.id" @click="selectClass(kls)" class="mx-1 px-2 py-3 mb-3 rounded-lg border cursor-pointer transition-all hover:shadow-md" :class="{
+                                    <div v-for="kls in klasses" :key="kls.id" @click="selectKlass(kls)" class="mx-1 px-2 py-3 mb-3 rounded-lg border cursor-pointer transition-all hover:shadow-md" :class="{
                                         'border-indigo-500 bg-indigo-50': selectedKlass && selectedKlass.id === kls.id,
                                         'border-gray-200': !selectedKlass || selectedKlass.id !== kls.id
                                     }">
@@ -88,18 +87,18 @@
                                 </div>
                             </div>
                         </div>
-
+                        
                         <!-- 科目选择区 -->
                         <div class="section-container" :class="{'active-section': currentSection === 2}" v-if="selectedKlass">
                             <div class="p-6 h-full flex flex-col">
                                 <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                                    <BookOutlined  class="text-indigo-600"/> 选择科目
+                                    <BookOutlined  class="mr-2 text-indigo-600"/> 选择科目
                                     <!-- <span class="ml-auto text-sm text-gray-500">{{ selectedKlass.subjects.length }} 科目</span> -->
                                 </h2>
 
                                 <div class="flex-1 overflow-y-auto ">
-                                    <div v-for="course in courses.filter( x => x.klass_id == selectedKlass.id)" :key="course.id" @click="selectCourse(course)" 
-                                        class="p-2 mb-3 rounded-lg border cursor-pointer transition-all hover:shadow-md course-item" :class="{
+                                    <div v-for="course in courses" :key="course.id" @click="selectCourse(course)" 
+                                        class="mx-1 px-2 py-3 mb-3 rounded-lg border cursor-pointer transition-all hover:shadow-md course-item" :class="{
                                         'border-indigo-500 bg-indigo-50': selectedCourse && selectedCourse.id === course.id,
                                         'border-gray-200': !selectedCourse || selectedCourse.id !== course.id
                                     }">
@@ -123,40 +122,55 @@
                             </div>
                         </div>
                         
-                        <!-- 科目细项 -->
-                        <div class="section-container" :class="{'active-section': currentSection === 3}" v-if="selectedCourse">
+                        <!-- 管理细项 -->
+                        <div class="section-container col-span-2" :class="{'active-section': currentSection === 3}" v-if="selectedCourse">
                             <div class="p-6 h-full flex flex-col">
                                 <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                                    <MenuUnfoldOutlined class="text-indigo-600"/> 管理细项
+                                    <MenuUnfoldOutlined class="mr-2 text-indigo-600"/> 管理細項
                                     <!-- <span class="ml-auto text-sm text-gray-500">{{ selectedCourse.items.length }} 细项</span> -->
                                 </h2>
 
 
                                 <!-- 添加新细项 -->
                                 <div class="mb-4">
-                                    <h3 class="font-medium text-gray-700 mb-2">添加新细项</h3>
-                                    <div class="flex">
-                                        <input type="text" v-model="newItemName" placeholder="输入细项名称..." class="flex-1 px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                                        <button @click="addItem" class="px-4 bg-indigo-600 text-white rounded-r-lg hover:bg-indigo-700 transition disabled:opacity-50" :disabled="!newItemName.trim()">
-                                            <PlusOutlined />
-                                        </button>
+                                    <div class="flex flex-col bg-slate-200/75 px-2 pt-2 rounded-lg shadow-md">
+                                        <div class="text-base font-semibold text-gray-700 mx-4 flex items-center gap-1">添加新細項 <PlusOutlined /></div>
+                                        <a-divider class="m-2"/>
+                                        <a-form class="grid grid-cols-2" :model="newScoreColumn" :label-col="{ span: 8 }" :wrapper-col="{ span: 16 }" autocomplete="off" @finish="addScoreColumn">
+                                            <a-form-item label="代號" name="column_letter"  >
+                                                <a-input type="text" v-model:value="newScoreColumn.column_letter" :disabled="true" placeholder="自動生成" class="flex-1 px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                                            </a-form-item>
+                                            <a-form-item label="序號" name="sequence"  >
+                                                <a-input type="text" v-model:value="newScoreColumn.sequence" placeholder="輸入排列序號" class="flex-1 px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                                            </a-form-item>
+                                            <a-form-item label="學分欄名稱" name="field_label" :rules="[{ required: true, message: '請輸入學分欄名稱' }]" >
+                                                <a-input type="text" v-model:value="newScoreColumn.field_label" placeholder="輸入學分欄名稱" class="flex-1 px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                                            </a-form-item>
+                                            <a-form-item label="學段" name="term_id" >
+                                                <a-select v-model:value="newScoreColumn.term_id" placeholder="選擇學段" :options="terms" class="focus:outline-none focus:ring-2 focus:ring-indigo-300"></a-select>
+                                            </a-form-item>
+                                            <a-form-item label="計算公式" name="formular" >
+                                                <a-input type="text" v-model:value="newScoreColumn.formular" placeholder="輸入計算公式" class="flex-1 px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                                            </a-form-item>
+                                            <a-form-item label="簡介" name="description" >
+                                                <a-input type="text" v-model:value="newScoreColumn.description" placeholder="輸入簡介" class="flex-1 px-4 py-2 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-300" />
+                                            </a-form-item>
+                                            
+                                            <a-form-item :wrapper-col="{ offset: 8, span: 16 }">
+                                                <a-button type="primary" html-type="submit">提交</a-button>
+                                            </a-form-item>
+                                        </a-form>
                                     </div>
                                 </div>
 
                                 <!-- 细项列表 -->
-                                <div class="flex-1 overflow-y-auto">
-
-                                    <div v-for="(scoreColumn, index) in selectedCourse.scoreColumns" :key="index" class="p-4 mb-3 rounded-lg border border-gray-200 bg-white">
-                                        <div class="flex items-start">
-                                            <div class="mr-3 mt-1">
-                                                <input type="checkbox" v-model="scoreColumn.completed" class="h-5 w-5 text-indigo-600 rounded focus:ring-indigo-500">
-                                            </div>
+                                <div class="flex-1 overflow-y-auto">    
+                                    <div v-for="(scoreColumn, index) in selectedCourse.scoreColumns" :key="index" class="mx-1 px-2 py-3 mb-3 rounded-lg border border-gray-200 bg-white"
+                                        :class="{'!bg-green-300':scoreColumn.inserted}">
+                                        <div class="flex items-center px-4">
                                             <div class="flex-1">
                                                 <div :class="{'line-through text-gray-400': scoreColumn.completed}" class="font-medium">
-                                                    {{ scoreColumn.column_letter }} {{ scoreColumn.field_label }}                                                    {{ scoreColumn.field_label }}
-                                                </div>
-                                                <div class="text-xs text-gray-500 mt-1">
-                                                    <i class="far fa-calendar mr-1"></i> {{ scoreColumn.dueDate || '无截止日期' }}
+                                                    ( {{ scoreColumn.column_letter }} ) {{ scoreColumn.field_label }}
                                                 </div>
                                             </div>
                                             <div class="flex space-x-1">
@@ -170,39 +184,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- 统计信息 -->
-                                <div class="pt-4 border-t mt-4">
-                                    <div class="flex justify-between text-sm">
-                                        <div>
-                                            <span class="text-gray-600">总细项:</span>
-                                            <!-- <span class="font-medium ml-1">{{ selectedCourse.items.length }}</span> -->
-                                        </div>
-                                        <div>
-                                            <span class="text-gray-600">已完成:</span>
-                                            <span class="font-medium ml-1 text-green-600">
-                                                {{ completedItemsCount }} ({{ completedPercentage }}%)
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 完成状态提示 -->
-                        <div class="flex-1 flex items-center justify-center" v-if="selectedCourse && currentSection === 3">
-                            <div class="text-center max-w-md">
-                                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                    <i class="fas fa-check-circle text-4xl text-green-600"></i>
-                                </div>
-                                <h3 class="text-2xl font-bold text-gray-800 mb-2">细项管理完成</h3>
-                                <p class="text-gray-600 mb-6">
-                                    您已完成 {{ selectedCourse.name }} 科目的细项管理。
-                                    当前完成率: <span class="font-bold text-green-600">{{ completedPercentage }}%</span>
-                                </p>
-                                <button class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
-                                    返回科目列表
-                                </button>
                             </div>
                         </div>
                     </div>
@@ -220,15 +201,15 @@
                     <div class="flex space-x-6">
                         <div class="text-sm">
                             <span class="text-gray-600">班级:</span>
-                            <span class="font-medium ml-1">{{ classes.length }}</span>
+                            <!-- <span class="font-medium ml-1">{{ classes.length }}</span> -->
                         </div>
                         <div class="text-sm">
                             <span class="text-gray-600">科目:</span>
-                            <span class="font-medium ml-1">{{ totalSubjects }}</span>
+                            <!-- <span class="font-medium ml-1">{{ totalSubjects }}</span> -->
                         </div>
                         <div class="text-sm">
                             <span class="text-gray-600">细项:</span>
-                            <span class="font-medium ml-1">{{ totalItems }}</span>
+                            <!-- <span class="font-medium ml-1">{{ totalItems }}</span> -->
                         </div>
                     </div>
                 </div>
@@ -246,175 +227,75 @@ export default {
         AdminLayout,
         ...AntdIcons,
     },
-    props: ['klasses', 'courses'],
+    props: ['terms', 'klasses'],
     data() {
         return {
+            courses:[],
             currentSection: 1,
-            classes: [{
-                    id: 1,
-                    name: '三年一班',
-                    subjects: [{
-                            id: 101,
-                            name: '数学',
-                            items: [{
-                                    name: '代数基础',
-                                    completed: false
-                                },
-                                {
-                                    name: '几何概念',
-                                    completed: true
-                                },
-                                {
-                                    name: '概率统计',
-                                    completed: false
-                                }
-                            ]
-                        },
-                        {
-                            id: 102,
-                            name: '语文',
-                            items: [{
-                                    name: '古诗词鉴赏',
-                                    completed: true
-                                },
-                                {
-                                    name: '现代文阅读',
-                                    completed: false
-                                }
-                            ]
-                        },
-                        {
-                            id: 103,
-                            name: '英语',
-                            items: [{
-                                    name: '语法练习',
-                                    completed: false
-                                },
-                                {
-                                    name: '阅读理解',
-                                    completed: false
-                                },
-                                {
-                                    name: '口语训练',
-                                    completed: true
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    id: 2,
-                    name: '三年二班',
-                    subjects: [{
-                            id: 201,
-                            name: '物理',
-                            items: [{
-                                    name: '力学实验',
-                                    completed: true
-                                },
-                                {
-                                    name: '电学基础',
-                                    completed: false
-                                }
-                            ]
-                        },
-                        {
-                            id: 202,
-                            name: '化学',
-                            items: [{
-                                    name: '化学反应式',
-                                    completed: false
-                                },
-                                {
-                                    name: '实验安全',
-                                    completed: true
-                                }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    id: 3,
-                    name: '三年三班',
-                    subjects: [{
-                            id: 301,
-                            name: '生物',
-                            items: [{
-                                    name: '细胞结构',
-                                    completed: true
-                                },
-                                {
-                                    name: '遗传学基础',
-                                    completed: false
-                                }
-                            ]
-                        },
-                        {
-                            id: 302,
-                            name: '历史',
-                            items: [{
-                                name: '中国古代史',
-                                completed: false
-                            }]
-                        },
-                        {
-                            id: 303,
-                            name: '地理',
-                            items: [{
-                                    name: '世界地理',
-                                    completed: true
-                                },
-                                {
-                                    name: '气候类型',
-                                    completed: true
-                                }
-                            ]
-                        }
-                    ]
-                }
-            ],
             selectedKlass: null,
             selectedCourse: null,
-            newItemName: ''
+            newScoreColumn: {},
         }
     },
     computed: {
-        totalSubjects() {
-            return this.classes.reduce((total, cls) => total + cls.subjects.length, 0);
-        },
-        totalItems() {
-            return this.classes.reduce((total, cls) => {
-                return total + cls.subjects.reduce((subTotal, subject) => {
-                    return subTotal + subject.items.length;
-                }, 0);
-            }, 0);
-        }
     },
     methods: {
-        selectClass(cls) {
+        selectKlass(cls) {
             this.selectedKlass = cls;
             this.selectedCourse = null;
+            this.currentSection = 2;
+            
+            axios.get(route('director.klass.courses',{klass:this.selectedKlass.id}))
+                .then(res=>{
+                    console.log(res.data)
+                    this.courses = res.data
+                })
+                .catch(err=>{
+                    console.log(err);
+                })
         },
         selectCourse(course) {
             this.selectedCourse = course;
+            this.currentSection = 3;
             
-            axios.get(route('director.scoreColumn.getCourseScoreColumn',{course:this.selectedCourse.id}))
+            axios.get(route('director.course.getScoreColumns',{course:this.selectedCourse.id}))
                 .then(res=>{
                     this.selectedCourse.scoreColumns = res.data
                 })
                 .catch(err=>{
                     console.log(err);
                 })
-
         },
-        addItem() {
-            if (this.newItemName.trim()) {
-                this.selectedCourse.items.push({
-                    name: this.newItemName.trim(),
-                    completed: false
-                });
-                this.newItemName = '';
-            }
+        addScoreColumn() {
+            console.log( this.selectedCourse.scoreColumns)
+            console.log( this.newScoreColumn)
+            // this.selectedCourse.scoreColumns.push( this.newScoreColumn )
+            // return 
+        
+            
+            this.$inertia.post(route("director.course.scoreColumns.store",this.selectedCourse), this.newScoreColumn, {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: (page) => {
+                    
+                    let insert_score_column_id = page.props.data.id
+
+                    //Refresh updated course score
+                    this.selectCourse( this.selectedCourse )
+                    this.newScoreColumn = {}
+
+                    // 成功顯示
+                    setTimeout(() => {
+                        let record = this.selectedCourse.scoreColumns.find( x => x.id == insert_score_column_id)
+                        if( record ){
+                            record.inserted = true
+                        }
+                        
+                    }, 500); 
+                },
+                onError: (error) => {
+                }
+            });
         },
         deleteItem(index) {
             this.selectedCourse.items.splice(index, 1);
@@ -425,7 +306,7 @@ export default {
 
 <style>
 .horizontal-container {
-    display: flex;
+    /* display: flex; */
     height: calc(100vh - 120px);
     overflow-x: auto;
     overflow-y: hidden;
@@ -433,9 +314,7 @@ export default {
 }
 
 .section-container {
-    min-width: 360px;
-    width: 360px;
-    border-right: 1px solid #e5e7eb;
+    @apply border-r-2 border-slate-200 overflow-auto;
     transition: all 0.3s ease;
 }
 
@@ -444,8 +323,9 @@ export default {
 }
 
 .active-section {
-    background-color: #f0f9ff;
-    border-left: 4px solid #3b82f6;
+    @apply bg-blue-50/50;
+    /* background-color: #f0f9ff; */
+    border-left: 2px solid #3b82f6;
 }
 
 .course-item:hover .subject-actions {

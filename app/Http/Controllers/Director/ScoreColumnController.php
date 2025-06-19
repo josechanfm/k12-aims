@@ -8,6 +8,7 @@ use App\Models\ScoreColumn;
 use App\Models\Score;
 use App\Models\Course;
 use App\Models\Klass;
+use App\Models\Config;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -45,26 +46,27 @@ class ScoreColumnController extends Controller
     public function details(Course $course)
     {
         $klasses = Klass::all();
-        $courses = Course::all();
         return Inertia::render('Director/ScoreColumnDetails', [
+            'terms' => Config::item('year_terms'),
             'klasses' => $klasses,
-            'courses' => $courses,
         ]);
     }
 
     public function store(Course $course, Request $request)
     {
-        // dd($request->all());
-        $letter=ScoreColumn::where('course_id',$request->course_id)->orderBy('column_letter','DESC')->first()->column_letter;
+        $letter=ScoreColumn::where('course_id',$course->id)->orderBy('column_letter','DESC')->first()->column_letter;
         $data=$request->all();
         $data['field_name']=Str::uuid();
         $data['column_letter']=++$letter;
         $data['for_transcript']=false;
         $data['is_total']=false;
-        ScoreColumn::create($data);
-        Course::find($data['course_id'])->upsertMergeScoreColumn();
 
-        return redirect()->back();
+        $scoreColumn = $course->scoreColumns()->create($data);
+        // ScoreColumn::create($data);
+
+        $course->upsertMergeScoreColumn();
+
+        return redirect()->back()->with('data',['id' => $scoreColumn->id ]);
     }
 
     /**
@@ -146,9 +148,8 @@ class ScoreColumnController extends Controller
         return redirect()->back();
     }
 
-    public function getCourseScoreColumn(Course $course){
-        
-        return response()->json($course->scoreColumns);
+    public function course(Course $course){
+        return $course->scoreColumns;
     }
 
     public function reorder(Request $request){

@@ -20,7 +20,8 @@ return new class extends Migration
             $table->char('tag',5)->nullable();
             $table->char('stream',5)->nullable();
             $table->foreignId('study_id')->nullable();
-            $table->string('byname')->nullable();
+            $table->string('name_zh')->nullable();
+            $table->string('name_en')->nullable();
             $table->string('room')->nullable();
             $table->string('klass_head_ids')->nullable();
             $table->tinyInteger('current_term')->default(1);
