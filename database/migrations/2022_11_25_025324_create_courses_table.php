@@ -29,8 +29,8 @@ return new class extends Migration
 
             $table->boolean('active');
             $table->text('description')->nullable();
-            $table->string('score_column')->nullable();
-            $table->string('score_scheme')->nullable();
+            // $table->string('score_column')->nullable();
+            // $table->string('score_scheme')->nullable();
 
             $table->tinyInteger('current_term')->default(1);
             $table->timestamps();

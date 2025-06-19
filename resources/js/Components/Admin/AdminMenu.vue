@@ -168,6 +168,16 @@ const list = [{
         url: '/director/promotes',
     }],
 }, {
+    key: 'subjects',
+    roles: ['master', 'admin', 'director'],
+    title: '科目管理',
+    children: [{
+        key: 'subjects',
+        title: '學分管理',
+        url: '/director/score_columns/details',
+        // urlParamKey: 'gradeScope',
+    }],
+}, {
     key: 'teacher',
     roles: ['teacher'],
     title: '教師',

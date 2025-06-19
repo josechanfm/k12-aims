@@ -1,9 +1,11 @@
+
+
 <template>
 <!-- {{ props.score[0] }} -->
-<!-- {{ props.column }} -->
+<!-- {{ columns }} -->
 <!-- {{ nonEditableData }} -->
-<div class="tabulator-container">
-    <div ref="ScoreTable" id="example-table" class="tabulator-excel"></div>
+<div class="tabulator-container p-6">
+    <div ref="ScoreTable" id="example-table" class="tabulator-theme "></div>
 </div>
 </template>
 
@@ -23,22 +25,33 @@ const props = defineProps({
 const nonEditable = ['student_id', 'student_number', 'student_name']; // 不允许更改的欄
 const nonEditableKey = 'student_id'
 
+const FontRedThreshold = 50
+
 const columns = [
     { title:"學生編號", field:"student_number" },
     { title:"學生姓名", field:"student_name" },
-    // { title:"abc", field:"scores" },
-    
 ]
 // -----------
+
+var table = ref(null)
+
 const emit = defineEmits(["store"]);
 
 const ScoreTable = ref(null);
 let nonEditableData = []; // 不允许更改的數據
 
+// 加 dynamic column
 props.column.forEach((col)=>{
     columns.push( {
         title: "( " + col.column_letter +  " )" + col.field_label ,
         field: col.id.toString(),
+        validator: ["numeric"], // 验证必须是数字且必填
+        formatter:function(cell){
+            if( !cell.getValue() ) return; // 如果不是空值
+            const value = parseFloat(cell.getValue()) ;
+            const color = value < FontRedThreshold ? "red" : "inherit";
+            return `<span style="color:${color}">${value}</span>`;
+        },
     })
 })
 let score = props.score
@@ -58,7 +71,7 @@ onMounted(() => {
             return acc;
         }, {})
     );
-    var table = new Tabulator(ScoreTable.value, {
+    table = new Tabulator(ScoreTable.value, {
         data:score,
 
         history:true,
@@ -106,10 +119,12 @@ onMounted(() => {
     // 撤销功能
     const undo = () => {
         table.undo();
+        storeScore()
     };
     // 重做功能
     const redo = () => {
         table.redo();
+        storeScore()
     };
 
     // 键盘事件处理
@@ -128,6 +143,10 @@ onMounted(() => {
     window.addEventListener('keydown', handleKeyDown);
 
     table.on("clipboardPasted", function(pasteData, columns, rows){
+        window.x = columns 
+        window.y = rows 
+        console.log( pasteData )
+
         // 过滤掉 nonEditable 字段的修改
         // 將不可更改的值重新覆蓋
         score =  score.map(DataItem => {
@@ -136,14 +155,11 @@ onMounted(() => {
             if (rawItem) {
                 return { ...DataItem, ...rawItem }; // 用 rawItem 的值覆蓋 DataItem 的值
             }
+            
             return { ...DataItem };
         });
         table.setData(score);
         // -------------
-        
-        score.forEach( (col)=>{
-            col = updateStoreScores(col)
-        })
 
         storeScore()
     }); 
@@ -159,7 +175,6 @@ onMounted(() => {
             return false; // 阻止修改
         }
 
-        cell.getRow().getData().scores[field].point=newValue
         storeScore()
     }); 
     
@@ -175,20 +190,52 @@ const updateStoreScores = (data) =>{
         if (data.scores && data.scores[scoreColumnId]) {
             // 更新 point 值
             data.scores[scoreColumnId].point = pointValue;
-        
-            // 如果需要，可以同时更新 updated_at 时间戳
-            if (data.scores[scoreColumnId].updated_at) {
-                data.scores[scoreColumnId].updated_at = new Date().toISOString();
-            }
         }
     }
-    
     return data;
 }
 
 const storeScore = () => {
+    
+    score.forEach( (col)=>{
+        col = updateStoreScores(col)
+    })
+
+    console.log('Store Score');
     // console.log(score); return ;
     emit('store', score);
 }
 </script>
+
+
+<style >
+
+/* 表头样式 */
+.tabulator-theme{
+    @apply bg-gray-200
+}
+.tabulator-theme .tabulator-header .tabulator-col {
+    @apply bg-blue-600 text-white;
+}
+.tabulator-theme .tabulator-col:hover {
+    @apply bg-blue-700
+}
+.tabulator .tabulator-header .tabulator-col.tabulator-range-highlight {
+    @apply bg-blue-800 text-white
+}
+/* 行悬停效果 */
+.tabulator-theme .tabulator-row:hover {
+    @apply bg-blue-50/70;
+}
+.tabulator-col-title {
+    @apply h-12 flex items-center ;
+}
+.tabulator-editable {
+    @apply text-lg;
+}
+.tabulator-row .tabulator-cell.tabulator-editing input{
+    @apply text-lg !important;
+}
+
+</style>
 

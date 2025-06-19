@@ -4,11 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Validator;
 
 class Score extends Model
 {
     use HasFactory;
     protected $fillable=['klass_student_id','score_column_id','point'];
+    protected $hidden = [ 'laravel_through_key' ];
+
 
     public function score_column(){
         return $this->belongsTo(ScoreColumn::class);
@@ -22,16 +25,23 @@ class Score extends Model
         return $this->belongsToMany(Student::class,'klass_student','student_id','klass_id');
     }
     static function updateScore($data){
-       
-        foreach( $data as $i=>$d){
-            if( is_null($d['point']) || $d['point']=='' ){ // unsert record if point value is empty
-                unset($data[$i]);
-            }
-        }
-        dd($data);
+        // $validate = Validator::make( array_values($data),[
+        //     'course_student_id'=>'',
+        //     'score_column_id'=>'',
+        //     'point'=>''
+        // ])->validated();
+        $data = array_map( function($d){ 
+            return [
+                'course_student_id' => $d['course_student_id'],
+                'score_column_id' => $d['score_column_id'],
+                'point' => $d['point'],
+                'student_id' => $d['student_id'],
+            ] ;
+        }, $data );
         Score::upsert(
             $data,
-            ['course_student_id','score_column_id','student_id']
+            ['course_student_id','score_column_id','student_id'],
+            ['point']
         );
         
         // check and proceed merge course scores

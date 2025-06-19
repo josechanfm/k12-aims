@@ -2,60 +2,63 @@
     <AdminLayout title="班別列表" :breadcrumb="breadcrumb">
         <div  class="p-2 bg-white rounded-lg flex flex-col gap-1">
         <!--  -->
-        <div class="flex flex-wrap font-bold text-sm gap-1">
-                <div class=" capsule-outline ">
-                    <div class="capsule-label ">學年</div>
-                    <div class=" "> 
-                       <!-- {{ grade.year.title }}     -->
-                    </div>
-                </div>
-                <div class="capsule-outline">
-                    <div class="capsule-label ">年級</div>
-                    <!-- <div class=" ">{{ grade.tag  }}</div> -->
-                </div>
-                <div class="flex-1"></div>
-            </div>
+      
         <!--  -->
         
         <div class="flex">
             <div class="flex-1 flex gap-1 items-center">
-            <!-- <a-button as="link" :key="g.id" v-for="g in grades" :href="route('admin.grade.klasses.index', g.id)"
-                :type="grade.tag==g.tag?'active':'list'" >
+            <a-button as="link" :key="g.id" v-for="g in grades" :href="route('admin.klasses.index', {'gradeYear':g.id})"
+                :type="g.grade_year==gradeYear?'active':'list'" >
                 {{g.tag }}
-            </a-button> -->
+            </a-button>
         </div>  
             <!-- <a-button @click="createRecord()" type="create" size="small">新增班別</a-button> -->
         </div>
-        <div  class="rounded-lg border-gray-200 border p-2">{{selectKlassId}}
-             <a-tabs v-model:activeKey="selectKlass" centered>
-                    <a-tab-pane v-for="klass in klasses" :key="klass" :tab="klass.tag">
-                        <!-- head_ids -->
-                       <div class="flex items-center gap-1">
+        <div  class="rounded-lg border-gray-200 border p-2 ">
+             <a-tabs v-model:activeKey="selectKlassId"  type="card">
+                    <a-tab-pane v-for="klass in klasses" :key="klass.id" :tab="klass.tag">
+                        <div class="flex gap-1 w-full"> 
+                            <!-- head_ids -->
+                            
+                        <div class="flex items-center gap-1 bg-gray-50 border border-black/20  p-1 rounded-lg    ">
                             <div class="cursor-pointer "  >
-                                <div class=" rounded-lg p-1 !text-blue-600 font-black bg-blue-200" v-if="klass.is_modify_head_ids===true" @click="storeHeadIds(klass)">保存 </div>
-                                <div class=" rounded-lg p-1 !text-green-600 font-black bg-green-200" v-else @click="klass.is_modify_head_ids=!!!(klass.is_modify_head_ids)">修改 </div>
+                                    <div class=" rounded-lg p-1 !text-blue-600 font-black bg-blue-200" v-if="klass.is_modify_head_ids===true" @click="storeHeadIds(klass)">保存 </div>
+                                    <div class=" rounded-lg p-1 !text-green-600 font-black bg-green-200" v-else @click="klass.is_modify_head_ids=!!!(klass.is_modify_head_ids)">修改 </div>
+                                </div>
+                                <div v-if="klass.is_modify_head_ids===true">
+                                    <a-select  v-model:value="klass.klass_head_ids" class="!min-w-32 !w-64" placeholder="請選擇..."
+                                    max-tag-count="responsive" :options="teachers" mode="multiple"
+                                    :field-names="{ value: 'id', label: 'name_zh'  }"></a-select>
+                                </div>
+                                <div  v-else>
+                                <a-tag  v-for="x in  klass.klass_heads" :key="x">{{ x.name_zh }}</a-tag>
+                                </div>
                             </div>
-                            <div v-if="klass.is_modify_head_ids===true">
-                                <a-select  v-model:value="klass.klass_head_ids" class="!min-w-32 !w-64" placeholder="請選擇..."
-                                max-tag-count="responsive" :options="teachers" mode="multiple"
-                                :field-names="{ value: 'id', label: 'name_zh'  }"></a-select>
+                            <div class="flex-1">
                             </div>
-                            <div  v-else>
-                            <a-tag v-for="x in  klass.klass_heads" :key="x">{{ x.name_zh }}</a-tag>
+                            <!--  -->
+                            <div class="border-gray-300 border p-1 rounded-lg  m-1">
+                                <a-radio-group size="small" class=""
+                                    v-model:value="klass.current_term" 
+                                    @change="onClickSelectedTermLock(klass.id,klass.current_term)" >
+                                <a-radio class="rounded-lg"
+                                    :class="term.value==klass.current_term?'text-blue-600 font-black':''"
+                                    v-for="term in yearTerms" :key="term.value" :value="term.value">{{term.label}}</a-radio>
+                                </a-radio-group>   
+                                <!--  -->
+                                <a-popconfirm
+                                    :title="(klass.course_locked?'是否確定解鎖':'是否確定鎖定')+klass.tag+'的成績表?'"
+                                    ok-text="Yes"
+                                    cancel-text="No"
+                                    @confirm="onClickSelectedTermLock(klass.id,0)"
+                                > 
+                                <a-button >
+                                        {{ klass.course_locked?'解鎖成績':'鎖定成績' }}
+                                    </a-button>
+                                </a-popconfirm>
                             </div>
                         </div>
-                        <!--  -->
-                        <a-popconfirm
-                            :title="(klass.course_locked?'是否確定解鎖':'是否確定鎖定')+klass.tag+'的成績表?'"
-                            ok-text="Yes"
-                            cancel-text="No"
-                            @confirm="onClickSelectedTermLock(klass.id,0)"
-                        > 
-                        <a-button type="xs-normal">
-                                {{ klass.course_locked?'解鎖成績':'鎖定成績' }}
-                            </a-button>
-                        </a-popconfirm>
-                        <a-button @click="editRecord(record)" size="small" class="!text-xs" type="edit">修改</a-button>
+                        <!-- <a-button @click="editRecord(record)" size="small" class="!text-xs" type="edit">修改</a-button> -->
                         <!--  -->
                         <a-table :dataSource="klass.courses">
                             <a-table-column title="" >
@@ -188,10 +191,11 @@ export default {
             },
           
        
-            selectKlassId:0,
+            selectKlassId:'',
         }
     },
     mounted(){
+        this.selectKlassId=this.klasses[0].id
         // axios.get(route('api.config.item',{key:'year_terms'}))
         //     .then(res=>{
         //         this.yearTerms=res.data

@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Course extends Model
 {
     use HasFactory;
-    protected $fillable=['klass_id','code','title_zh','title_en','type','stream','elective','description','score_column','score_scheme','in_transcript','unit','active','transcript_locked'];
+    protected $fillable=['klass_id','study_subject_id','code','title_zh','title_en','description','active'];
     protected $appends=['student_count','subject_heads','teacher_ids','teaching','study_subject'];
     // protected $casts=['subject_head_ids'=>'array'];
 
@@ -68,7 +68,7 @@ class Course extends Model
             'course_student_id',
             'id',
             'id'
-        );
+        )->withoutGlobalScopes();
     }
     public function scores(){
         return $this->belongsToMany(Student::class,'course_student')->withPivot('id as pivot_course_student_id');
@@ -114,6 +114,7 @@ class Course extends Model
 
         $students=$this->students;
         $scores=$this->allScores;
+        // dd($scores);
         $scoreColumns=$this->scoreColumns;
         $table=[];
         foreach($students as $student){
@@ -145,7 +146,7 @@ class Course extends Model
             $table[$student->id]=$tmp;
             //array_push($table, $tmp);
         }
-        //dd($table[316]);
+        // dd($table);
         return $table;
     }
 

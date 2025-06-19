@@ -117,10 +117,10 @@ class ScoreController extends Controller
     }
 
     public function batchUpdate(Course $course, Request $request){
+        
         $data = $request->all();
         // dd($data);
         foreach( $data as $student){
-            // dd($student['scores']);
             $updatedCount=Score::updateScore($student['scores']);
         }
         // $updatedCount=Score::updateScore($data);

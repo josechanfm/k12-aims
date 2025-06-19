@@ -10,4 +10,9 @@ class CourseStudent extends Model
     use HasFactory;
     protected $table='course_student';
 
+    
+    public function scores()
+    {
+        return $this->hasMany(Score::class, 'course_student_id');
+    }
 }

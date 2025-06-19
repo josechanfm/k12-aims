@@ -415,7 +415,7 @@ export default {
             //     })
             // })
             // console.log(data);return ;
-            
+
             this.$inertia.post(route("teacher.course.scores.batchUpdate", this.course), score, {
                 preserveScroll:true,
                 preserveState:true,

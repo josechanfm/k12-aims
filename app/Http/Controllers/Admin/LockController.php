@@ -45,7 +45,7 @@ class LockController extends Controller
             }else{
                 Course::whereBelongsTo($klass)->update(['current_term'=>0]);
             }
-            $klass->lock_courses=!$klass->course_locked;
+            $klass->course_locked= !$klass->course_locked;
             $klass->save();
         }
         return redirect()->back();

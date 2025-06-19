@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 use App\Models\ScoreColumn;
 use App\Models\Score;
 use App\Models\Course;
+use App\Models\Klass;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
 
 class ScoreColumnController extends Controller
 {
@@ -30,6 +32,7 @@ class ScoreColumnController extends Controller
     public function create()
     {
         //
+        
     }
 
     /**
@@ -38,6 +41,17 @@ class ScoreColumnController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+    public function details(Course $course)
+    {
+        $klasses = Klass::all();
+        $courses = Course::all();
+        return Inertia::render('Director/ScoreColumnDetails', [
+            'klasses' => $klasses,
+            'courses' => $courses,
+        ]);
+    }
+
     public function store(Course $course, Request $request)
     {
         // dd($request->all());
@@ -130,6 +144,11 @@ class ScoreColumnController extends Controller
         Score::where('score_column_id',$scoreColumn->id)->delete();
         $scoreColumn->delete();
         return redirect()->back();
+    }
+
+    public function getCourseScoreColumn(Course $course){
+        
+        return response()->json($course->scoreColumns);
     }
 
     public function reorder(Request $request){

@@ -124,6 +124,10 @@ Route::group([
     Route::resource('years',App\Http\Controllers\Admin\YearController::class)->names('admin.years');
     Route::resource('registrations',App\Http\Controllers\Admin\RegistrationController::class)->names('admin.registrations');
     //Route::get('year/{year}/grades',[App\Http\Controllers\Admin\YearController::class,'grades'])->name('admin.year.grades');
+    //用於插入已存在的學生
+    Route::resource('klassStudentEnroll',App\Http\Controllers\Admin\KlassStudentEnrollController::class)
+                ->names('admin.klassStudentEnroll');
+     
     Route::resource('enrollments',App\Http\Controllers\Admin\EnrollmentController::class)->names('admin.enrollments');
     Route::resource('candidates',App\Http\Controllers\Admin\CandidateController::class)->names('admin.candidates');
     Route::put('candidate/accepted',[App\Http\Controllers\Admin\CandidateController::class,'accepted'])->name('admin.candidate.accepted');
@@ -176,7 +180,7 @@ Route::group([
         Route::resource('course_staff',App\Http\Controllers\Director\CourseStaffController::class)->names('director.courseStaff');
         Route::get('/course/{course}/makeups',[App\Http\Controllers\Director\CourseController::class,'makeups'])->name('director.course.makeups');
         Route::get('/klass/{klass}/courses',[App\Http\Controllers\Director\CourseController::class,'klass'])->name('director.klass.courses');
-
+        
         Route::resource('klasses',App\Http\Controllers\Director\KlassController::class)->names('director.klasses');
         Route::get('/klass_scores/{klassId}',[App\Http\Controllers\Director\KlassController::class,'klass_scores']);
 
@@ -212,7 +216,9 @@ Route::group([
         Route::get('/klass/{klass}/final_scores',[App\Http\Controllers\Director\ScoreController::class,'finalScores'])->name('director.klass.finalScores');
         
         Route::post('course/{course}/score_column/reorder',[App\Http\Controllers\Director\ScoreColumnController::class,'reorder'])->name('director.course.scoreColumn.reorder');
-        Route::resource('course/{course}/score_columns',App\Http\Controllers\Director\ScoreColumnController::class)->names('director.course.scoreColumns');
+        Route::get('score_columns/details/{course?}',[App\Http\Controllers\Director\ScoreColumnController::class, 'details'])->name('director.scoreColumn.details');
+        Route::get('score_columns/{course?}/get_course_score_column',[App\Http\Controllers\Director\ScoreColumnController::class, 'getCourseScoreColumn'])->name('director.scoreColumn.getCourseScoreColumn');
+        Route::resource('course/{course?}/score_columns',App\Http\Controllers\Director\ScoreColumnController::class)->names('director.course.scoreColumns');
 
         Route::post('/makeup/create_or_cancel',[App\Http\Controllers\Director\MakeupController::class,'createOrCancel'])->name('director.makeup.createOrCancel');
         Route::post('/makeup/update',[App\Http\Controllers\Director\MakeupController::class,'update'])->name('director.makeup.update');
