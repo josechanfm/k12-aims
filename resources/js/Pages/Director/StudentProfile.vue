@@ -8,25 +8,23 @@
                 <div class="flex items-center gap-3">
                     <span class="text-white font-medium">編輯模式:</span>
                     <a-switch 
-                    v-model:checked="isEdit" 
-                    @change="onChangeEditMode"
+                    v-model:checked="isEditMode" 
                     checkedChildren="開啟" 
                     unCheckedChildren="關閉"
                     class="font-semibold"
-                    :class="isEdit ? 'bg-blue-200' : 'bg-gray-200'"
+                    :class="isEditMode ? 'bg-blue-200' : 'bg-gray-200'"
                     />
                 </div>
             </div>
-
             <div class="p-5">
                 <div class="flex flex-col md:flex-row gap-6">
                     <div class="flex-shrink-0 flex justify-center">
-                        <div class="bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl border-2 border-white shadow-md p-2 w-32 h-40 flex items-center justify-center overflow-hidden">
-                            <div v-if="student.avatars[0] && student.avatars[0].image" class="rounded-lg overflow-hidden">
+                        <div class="bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl border-2 border-white shadow-md w-32 h-40 flex items-center justify-center overflow-hidden">
+                            <div v-if="student.avatars[0] && student.avatars[0].avatar" class="rounded-lg overflow-hidden">
                                 <a-image 
-                                    width="2.4cm" 
-                                    height="3.2cm"
-                                    :src="student.avatars[0].image.original_url" 
+                                    width="2.8cm" 
+                                    height="3.8cm"
+                                    :src="student.avatars[0].avatar.original_url" 
                                     class="rounded-lg object-cover"
                                     :preview="false"
                                 />
@@ -111,8 +109,8 @@
         </div>
 
         
-        <div :class="isEdit ? 'formEditOn' : 'formEditOff'">
-            <div class="my-2 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl shadow-md p-3 border border-blue-100">
+        <div :class="isEditMode ? 'formEditOn' : 'formEditOff'">
+            <div class="my-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl shadow-md p-3 border border-blue-100">
                 <div class="flex flex-col md:flex-row items-center gap-3">
                 <!-- 标题区域 -->
                 <div class="flex items-center bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-2 px-5 rounded-full shadow-lg min-w-max">
@@ -124,9 +122,9 @@
                 <div class="w-full py-4">
                     <a-checkbox-group 
                     v-model:value="activeKeys" 
-                    class="flex flex-wrap gap-2 h-auto xl:h-20 2xl:h-auto"
+                    class="flex flex-wrap gap-2"
                     >
-                    <transition-group name="fade" tag="div" class="flex flex-wrap gap-8 md:gap-4">
+                    <transition-group name="fade" tag="div" class="flex flex-wrap gap-8 md:gap-6">
                         <div v-for="(label, key) in header_zh" :key="key">
                         <a-checkbox 
                             :value="key" 
@@ -141,10 +139,6 @@
                             'bg-white text-gray-700 border border-gray-300 hover:border-blue-400': !activeKeys.includes(key)
                             }"
                         >
-                            <i 
-                            class="mr-2 text-xs" 
-                            :class="activeKeys.includes(key) ? 'fas fa-check-circle' : 'far fa-circle'"
-                            ></i>
                             {{ label }}
                         </label>
                         </div>
@@ -157,7 +151,7 @@
                     <a-tooltip title="全選所有類型">
                     <button 
                         @click="selectAll"
-                        class="p-2 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
+                        class="flex items-center px-2 py-2 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
                     >
                         <CheckOutlined />
                     </button>
@@ -165,7 +159,7 @@
                     <a-tooltip title="清除所有選擇">
                     <button 
                         @click="deselectAll"
-                        class="p-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
+                        class="flex items-center px-2 py-2 bg-gray-100 text-gray-700 rounded-full hover:bg-gray-200 transition-colors"
                     >
                         <CloseOutlined />
                     </button>
@@ -180,337 +174,278 @@
                 </span>
                 </div>
             </div>
-            <a-form ref="formRef" name="advanced_search" class="ant-advanced-search-form" :model="student"
-                 :labelWrap='true'	  label-align="right"
-                :rules="rules" @finish="onFinish" @finishFailed="onFinishFailed">
-                <div class="flex flex-col gap-2 bg-white p-2">
-                    <transition-group name="list">
-                    <div class="ant-form-bg" key="avatar" header=""  v-if='activeKeys.includes("avatar")  ||  activeKeys.includes("all")' >
-                        <div class="form-header">頭像照片</div>
-                        <div  class="flex flex-col gap-1 rounded-2xl p-2">
-                            <div  v-for="avatar,idx in student.avatars" :key="idx">
-                                <UploadAvatars :avatar="avatar"></UploadAvatars>
-                                <!-- <div v-if="avatar.image">
-                                    
-                                </div>
-                                <div v-else>
-                                    <a-avatar shape="square" :size="92">
-                                    </a-avatar>                            
-                                </div> -->
-                            </div>
+
+        </div>
+        <div class="p-6 bg-white rounded-xl shadow-lg">
+            <!-- 表单主体 -->
+            <a-form
+            :model="student"
+            layout="vertical"
+            :disabled="!isEditMode"
+            class="space-y-10"
+            >
+            <!-- 基本信息卡片 -->
+            <a-card title="頭像信息" class="shadow-md" v-if="activeKeys.includes('avatar')">
+                <div  class="flex flex-col gap-1 rounded-2xl p-2">
+                    <div  v-for="avatar,idx in student.avatars" :key="idx">
+                        <UploadAvatars :avatar="avatar"></UploadAvatars>
+                        <!-- <div v-if="avatar.image">
+                            
                         </div>
+                        <div v-else>
+                            <a-avatar shape="square" :size="92">
+                            </a-avatar>                            
+                        </div> -->
                     </div>
-                    <div class="ant-form-bg"  v-if='activeKeys.includes("basic")  ||  activeKeys.includes("all")' >
-                        <div class="form-header">基本信息</div>
-                        <div class="flex flex-col gap-1 rounded-2xl p-2">
-                            <div class="flex flex-wrap gap-1">
-                                <a-form-item class="student-form-layout" label="姓名" name="name_zh"   >
-                                    <a-textarea autosize  v-model:value="student.name_zh" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="校內編號"   >
-                                    <a-textarea autosize  v-model:value="student.sid" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="教青局編號"   >
-                                    <a-textarea autosize  v-model:value="student.dsedj_num" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="衛生局金咭編號"   >
-                                    <a-textarea autosize  v-model:value="student.ssm_num" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="學生手提電話"   >
-                                    <a-textarea autosize  v-model:value="student.phone" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="外文姓名"     >
-                                    <a-textarea autosize  v-model:value="student.name_fn" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="成績表顯示英文名稱"     >
-                                    <a-textarea autosize  v-model:value="student.name_display" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="過往就請學校"     >
-                                    <a-textarea autosize  v-model:value="student.previour_school" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="過往就年級"    >
-                                    <a-textarea autosize  v-model:value="student.previour_grade" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="班別號"    >
-                                    <a-textarea autosize  v-model:value="student.start_klass" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="接收短訊用手提電話"  >
-                                    <a-textarea autosize  v-model:value="student.phone_sms" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="性別" >
-                                    <a-textarea autosize  v-model:value="student.gender" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="出生日期"   >
-                                    <a-date-picker v-model:value="student.dob" :format="dateFormat" :valueFormat="dateFormat" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="入學日期"   >
-                                    <a-date-picker v-model:value="student.entry_date" :format="dateFormat" :valueFormat="dateFormat" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="監護人"   >
-                                    display guardian
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="宗教"   >
-                                    <a-textarea autosize  v-model:value="student.religion" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="住宅電話"   >
-                                    <a-textarea autosize  v-model:value="student.phone_home" />
-                                </a-form-item>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="ant-form-bg" v-if='activeKeys.includes("id_card") ||  activeKeys.includes("all")' >
-                        <div  class="form-header">證件信息</div>
-                        <div class="flex flex-col ">
-                            <div class="flex flex-wrap gap-1">
-                                <a-form-item class="student-form-layout" label="證件類別" name="id_type">
-                                    <a-select placeholder="請選擇證件類別" v-model:value="student.id_type" :options="idTypeOptions" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="請指明證件類別" name="id_type_other" v-if="student.id_type == 'OT'">
-                                    <a-textarea autosize  v-model:value="student.id_type_other" />
-                                </a-form-item>
-                                <template v-if="student.id_type == 'OT'">
-                                    <a-form-item class="student-form-layout" label="簽發地點">
-                                        <a-select v-model:value="student.issue_place" :options="issuePlaceOptions" />
-                                    </a-form-item>
-                                    <a-form-item class="student-form-layout" label="請指明簽發地點" name="issue_place_other"
-                                        v-if="student.issue_place == 'OT'">
-                                        <a-textarea autosize  v-model:value="student.issue_place_other" />
-                                    </a-form-item>
-                                </template>
-                                <a-form-item class="student-form-layout" label="證件編號" name="id_num">
-                                    <a-textarea autosize  v-model:value="student.id_num" />
-                                </a-form-item>
-                                <template v-if="student.id_type == 'CT'">
-                                    <a-form-item class="student-form-layout" label="逗留簽發日期">
-                                        <a-date-picker v-model:value="student.stay_issue" :format="dateFormat"
-                                            :valueFormat="dateFormat" />
-                                    </a-form-item>
-                                    <a-form-item class="student-form-layout" label="逗留至有效日期">
-                                        <a-date-picker v-model:value="student.stay_expired" :format="dateFormat"
-                                            :valueFormat="dateFormat" />
-                                    </a-form-item>
-                                </template>
-                                <template v-else>
-                                    <a-form-item class="student-form-layout" label="本次發出日期">
-                                        <a-date-picker v-model:value="student.id_issue" :format="dateFormat"
-                                            :valueFormat="dateFormat" />
-                                    </a-form-item>
-                                    <a-form-item class="student-form-layout" label="有效日期">
-                                        <a-date-picker v-model:value="student.id_expired" :format="dateFormat"
-                                            :valueFormat="dateFormat" />
-                                    </a-form-item>
-                                </template>
-                                <a-form-item class="student-form-layout" label="回鄉證編號">
-                                    <a-textarea autosize  v-model:value="student.hrc_num" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="回鄉證簽發日期">
-                                    <a-date-picker v-model:value="student.hrc_issue" :format="dateFormat"
-                                        :valueFormat="dateFormat" />
-                                </a-form-item>
-                                <a-form-item class="student-form-layout" label="回鄉證有效日期">
-                                    <a-date-picker v-model:value="student.hrc_expired" :format="dateFormat"
-                                        :valueFormat="dateFormat" />
-                                </a-form-item>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="ant-form-bg"  v-if='activeKeys.includes("detail") ||  activeKeys.includes("all")' >
-                        <div  class="form-header">補充信息</div>
-                        <div  v-if="student.detail" class="flex flex-wrap gap-1">
-                            <a-form-item class="student-form-layout"  label="聖名">
-                                <a-textarea autosize  v-model:value="student.detail.holy_name" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="領洗日期">
-                                <a-date-picker v-model:value="student.detail.baptized" :format="dateFormat" :valueFormat="dateFormat" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="初領聖體日期">
-                                <a-date-picker v-model:value="student.detail.first_communion" :format="dateFormat" :valueFormat="dateFormat" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="有效日期(逗留)">
-                                <a-date-picker v-model:value="student.detail.stay_issue" :format="dateFormat" :valueFormat="dateFormat" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="兄弟姊妹總數">
-                                <a-textarea autosize  v-model:value="student.detail.sibling" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="已工作兄弟姊妹總數">
-                                <a-textarea autosize  v-model:value="student.detail.sibling_at_work" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="入校年級(過去就讀)">
-                                <a-textarea autosize  v-model:value="student.detail.previour_grade" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="入校日期(過去就讀)">
-                                <a-date-picker v-model:value="student.detail.entry_date" :format="dateFormat" :valueFormat="dateFormat" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="就讀年級(過去就讀)">
-                                <a-textarea autosize  v-model:value="student.detail.entry_klass" />
-                            </a-form-item >
-                        </div >
-                    </div>
-
-                    <div class="ant-form-bg"  v-if='activeKeys.includes("address") ||  activeKeys.includes("all")'>
-                        <div  class="form-header">住址信息</div>
-                        <div   v-if="student.address"  class="flex flex-wrap gap-1">
-                            <a-form-item class="student-form-layout"  label="住址街名"  >
-                                <a-textarea autosize  v-model:value="student.address.road" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="門牌大廈">
-                                <a-textarea autosize  v-model:value="student.address.building" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="居住地區">
-                                <a-textarea autosize  v-model:value="student.address.zone" />
-                            </a-form-item >
-                        </div >
-                    </div>
-
-                    <div class="ant-form-bg" v-if='activeKeys.includes("bank") ||  activeKeys.includes("all")'  >
-                        <div  class="form-header">銀行信息</div>
-                        <div   class="flex flex-wrap gap-1">
-                            <a-form-item class="student-form-layout"  label="銀行">
-                                <a-textarea autosize  v-model:value="student.bank.bank_name" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="戶口名稱">
-                                <a-textarea autosize  v-model:value="student.bank.account_name" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="銀行帳號">
-                                <a-textarea autosize  v-model:value="student.bank.account_number" />
-                            </a-form-item >
-                        </div >
-                    </div>
-
-
-                    <div class="ant-form-bg" v-if='activeKeys.includes("parent") ||  activeKeys.includes("all")' header="父母信息" >
-                        <div  class="form-header">父母信息</div>
-                        <div  class="flex flex-wrap gap-1"  v-if="student.father">
-                            <a-form-item class="student-form-layout" label="父親姓名">
-                                <a-textarea autosize  v-model:value="student.father.name_zh" />
-                            </a-form-item>
-                            <a-form-item class="student-form-layout" label="父親工作機構">
-                                <a-textarea autosize  v-model:value="student.father.occupation" />
-                            </a-form-item>
-                            <a-form-item class="student-form-layout" label="父親職業">
-                                <a-textarea autosize  v-model:value="student.father.occupation" />
-                            </a-form-item>
-                            <a-form-item class="student-form-layout" label="父親手提電話">
-                                <a-textarea autosize  v-model:value="student.father.mobile" />
-                            </a-form-item>
-                            <a-form-item class="student-form-layout" label="父親住址"  >
-                                <a-textarea autosize  v-model:value="student.father.name_zh" />
-                            </a-form-item>
-                            <a-form-item class="student-form-layout" label="母親姓名">
-                                <a-textarea autosize  v-model:value="student.mother.name_zh" />
-                            </a-form-item>
-                            <a-form-item class="student-form-layout" label="母親工作機構">
-                                <a-textarea autosize  v-model:value="student.mother.organization" />
-                            </a-form-item>
-                            <a-form-item class="student-form-layout" label="母親職業">
-                                <a-textarea autosize  v-model:value="student.mother.occupation" />
-                            </a-form-item>
-                            <a-form-item class="student-form-layout" label="母親手提電話">
-                                <a-textarea autosize  v-model:value="student.mother.mobile" />
-                            </a-form-item>
-                            <a-form-item class="student-form-layout" label="母親住址">
-                                <a-textarea autosize  v-model:value="student.mother.name_zh" />
-                            </a-form-item>
-                        </div >
-                    </div>
-
-                    <div class="ant-form-bg"   v-if='activeKeys.includes("guardian") ||  activeKeys.includes("all")'>
-                        <div  class="form-header">監護人信息</div>
-                        <div class="flex flex-wrap gap-1" v-if="student.guardian">
-                            <a-form-item class="student-form-layout"  label="監護人姓名">
-                                <a-textarea autosize  v-model:value="student.guardian.name_zh" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="監護人職業">
-                                <a-textarea autosize  v-model:value="student.guardian.occupation" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="監護人機構電話">
-                                <a-textarea autosize  v-model:value="student.guardian.mobile" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="監護人關係">
-                                <a-textarea autosize  v-model:value="student.guardian.kinship" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="監護人工作機構"  >
-                                <a-textarea autosize  v-model:value="student.guardian.organization" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="監護人電話">
-                                <a-textarea autosize  v-model:value="student.guardian.mobile" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="監護人居住地區"  >
-                                <a-textarea autosize  v-model:value="student.guardian.mobile" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="監護人郵政編號">
-                                <a-textarea autosize  v-model:value="student.guardian.mobile" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="監護人街道名稱"  >
-                                <a-textarea autosize  v-model:value="student.guardian.mobile" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="監護人門牌,大廈,樓座">
-                                <a-textarea autosize  v-model:value="student.guardian.mobile" />
-                            </a-form-item >
-                        </div >
-                    </div>
-
-                    <div class="ant-form-bg" v-if='activeKeys.includes("health") ||  activeKeys.includes("all")' key="" >
-                        <div  class="form-header">健康信息</div>
-                        <div   class="flex flex-wrap gap-1" v-if="student.health">
-                            <a-form-item class="student-form-layout"  label="醫院">
-                                <a-textarea autosize  v-model:value="student.health.hospital" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="學生健康情況"  >
-                                <a-textarea autosize  v-model:value="student.health.status" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="慢性疾患">
-                                <a-textarea autosize  v-model:value="student.health.chronic" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="遺傳性疾病">
-                                <a-textarea autosize  v-model:value="student.health.hereditary" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="（食物及藥物）過敏症">
-                                <a-textarea autosize  v-model:value="student.health.disease" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="remark"  >
-                                <a-textarea autosize  v-model:value="student.health.remark" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="創傷"  >
-                                trauma
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="創傷治療"  >
-                                trauma treatment
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="過敏"  >
-                                <a-textarea autosize  v-model:value="student.health.allergy" />
-                            </a-form-item >
-                            <a-form-item class="student-form-layout"  label="藥物過敏"  >
-                                medician allergy
-                            </a-form-item >
-                        </div >
-                    </div>
-
-                    <div class="ant-form-bg"  v-if='activeKeys.includes("siblings") ||  activeKeys.includes("all")'>
-                    <div  class="form-header">本校兄弟姊妹</div>
-                        <a-table :dataSource="student.siblings" :columns="columnSiblings">
-                            <template #bodyCell="{ column, text, record, index }">
-                                <template v-if="column.dataIndex == 'klasses'">
-                                    <ol>
-                                        <li v-for="klass in record.klasses">{{ klass.school_year }}-{{ klass.tag }}</li>
-                                    </ol>
-                                </template> 
-                                <template v-else>
-                                    {{record[column.dataIndex]}}
-                                </template>
-                            </template>
-                        </a-table>
-
-                        <a-button as="link" :href="route('director.student.siblings',student.id)" class="ant-btn">連結本校兄弟姊妹</a-button>
-                    </div>
-                    </transition-group>
-
                 </div>
-               <div class="flex" v-if='isEdit'>
-                    <div class="flex-1"></div> 
-                    <a-button type="create" @click="onFinish">提交並更改</a-button>
-               </div>
+            </a-card>
+            <a-card title="基本信息" class="shadow-md" v-if="activeKeys.includes('basic')">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <a-form-item label="學生代號" name="stud_id">
+                    <a-input v-model:value="student.stud_id" placeholder="請輸入學生代號" />
+                </a-form-item>
+                <a-form-item label="學生證編號" name="code">
+                    <a-input v-model:value="student.code" placeholder="請輸入學生證編號" />
+                </a-form-item>
+                <a-form-item label="中文姓名" name="name_c">
+                    <a-input v-model:value="student.name_c" placeholder="請輸入中文姓名" />
+                </a-form-item>
+                <a-form-item label="葡文姓名" name="name_p">
+                    <a-input v-model:value="student.name_p" placeholder="請輸入葡文姓名" />
+                </a-form-item>
+                <a-form-item label="性别" name="sex">
+                    <a-select v-model:value="student.sex" placeholder="請選擇性別">
+                    <a-select-option value="M">男</a-select-option>
+                    <a-select-option value="F">女</a-select-option>
+                    </a-select>
+                </a-form-item>
+                <a-form-item label="出生日期" name="b_date">
+                    <a-date-picker v-model:value="student.b_date" class="w-full" :valueFormat="dateFormat"/>
+                </a-form-item>
+                <a-form-item label="出生地點" name="b_place">
+                    <a-input v-model:value="student.b_place" placeholder="請輸入出生地點" />
+                </a-form-item>
+                <a-form-item label="國籍" name="nation">
+                    <a-input v-model:value="student.nation" placeholder="請輸入國籍" />
+                </a-form-item>
+                <a-form-item label="籍貫" name="origin">
+                    <a-input v-model:value="student.origin" placeholder="請輸入籍貫" />
+                </a-form-item>
+                </div>
+            </a-card>
+
+            <!-- 证件信息卡片 -->
+            <a-card title="證件信息" class="shadow-md" v-if="activeKeys.includes('id_card')">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a-form-item label="證件類型" name="id_type">
+                        <a-select v-model:value="student.id_type" placeholder="請選擇證件類型">
+                            <a-select-option value="身份證">身份證</a-select-option>
+                            <a-select-option value="護照">護照</a-select-option>
+                            <a-select-option value="港澳通行證">港澳通行證</a-select-option>
+                        </a-select>
+                    </a-form-item>
+                    <a-form-item label="證件號碼" name="id_no">
+                        <a-input v-model:value="student.id_no" placeholder="請輸入證件號碼" />
+                    </a-form-item>
+                    <a-form-item label="簽發地點" name="i_place">
+                        <a-input v-model:value="student.i_place" placeholder="請輸入簽發地點" />
+                    </a-form-item>
+                    <a-form-item label="簽發日期" name="i_date">
+                        <a-date-picker v-model:value="student.i_date" class="w-full" />
+                    </a-form-item>
+                    <a-form-item label="有效期" name="v_date">
+                        <a-date-picker v-model:value="student.v_date" class="w-full" />
+                    </a-form-item>
+                    <a-form-item label="逗留許可" name="s6_type">
+                        <a-select v-model:value="student.s6_type" placeholder="請選擇逗留許可">
+                            <a-select-option :value="1">永久 S6</a-select-option>
+                            <a-select-option :value="2">有限期 S6</a-select-option>
+                            <a-select-option :value="3">其他逗留許可</a-select-option> 
+                        </a-select>
+                    </a-form-item>
+                    <a-form-item label="簽證簽發日期" name="s6_idate" v-if="student.s6_type != null">
+                        <a-date-picker v-model:value="student.s6_idate" class="w-full" />
+                    </a-form-item>
+                    <a-form-item label="簽證有效期" name="s6_vdate" v-if="student.s6_type == 2 || student.s6_type == 3">
+                        <a-date-picker v-model:value="student.s6_vdate" class="w-full" />
+                    </a-form-item>
+                </div>
+            </a-card>
+
+            <!-- 聯絡信息卡片 -->
+            <a-card title="聯絡信息" class="shadow-md" v-if="activeKeys.includes('contact')">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a-form-item label="電話" name="tel">
+                        <a-input v-model:value="student.tel" placeholder="請輸入電話號碼" />
+                    </a-form-item>
+                    <a-form-item label="手機" name="mobile">
+                        <a-input v-model:value="student.mobile" placeholder="請輸入手機號碼" />
+                    </a-form-item>
+                    <a-form-item label="地區" name="area">
+                        <a-input v-model:value="student.area" placeholder="請輸入地區" />
+                    </a-form-item>
+                    <a-form-item label="郵政編碼" name="postal_code">
+                        <a-input v-model:value="student.postal_code" placeholder="請輸入郵政編碼" />
+                    </a-form-item>
+                    <a-form-item label="道路" name="road">
+                        <a-input v-model:value="student.road" placeholder="請輸入道路名稱" />
+                    </a-form-item>
+                    <a-form-item label="詳細地址" name="address">
+                        <a-textarea v-model:value="student.address" placeholder="請輸入詳細地址" />
+                    </a-form-item>
+                    <a-form-item label="住宿地址相同" name="sleep_same">
+                        <a-checkbox v-model:checked="student.sleep_same">
+                            與通訊地址相同
+                        </a-checkbox>
+                    </a-form-item>
+                    <template v-if="!student.sleep_same">
+                        <a-form-item label="住宿地區" name="r_area">
+                            <a-input v-model:value="student.r_area" placeholder="請輸入住宿地區" />
+                        </a-form-item>
+                        <a-form-item label="住宿描述" name="ra_desc">
+                            <a-input v-model:value="student.ra_desc" placeholder="請輸入住宿描述" />
+                        </a-form-item>
+                        <a-form-item label="住宿道路" name="s_road">
+                            <a-input v-model:value="student.s_road" placeholder="請輸入住宿道路" />
+                        </a-form-item>
+                        <a-form-item label="住宿詳細地址" name="s_address">
+                            <a-textarea v-model:value="student.s_address" placeholder="請輸入住宿詳細地址" />
+                        </a-form-item>
+                    </template>
+                </div>
+            </a-card>
+
+            <!-- 家庭資訊卡片 -->
+            <a-card title="家庭信息" class="shadow-md" v-if="activeKeys.includes('family')">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a-form-item label="父親姓名" name="father">
+                        <a-input v-model:value="student.father" placeholder="請輸入父親姓名" />
+                    </a-form-item>
+                    <a-form-item label="母親姓名" name="mother">
+                        <a-input v-model:value="student.mother" placeholder="請輸入母親姓名" />
+                    </a-form-item>
+                    <a-form-item label="父親職業" name="f_prof">
+                        <a-input v-model:value="student.f_prof" placeholder="請輸入父親職業" />
+                    </a-form-item>
+                    <a-form-item label="母親職業" name="m_prof">
+                        <a-input v-model:value="student.m_prof" placeholder="請輸入母親職業" />
+                    </a-form-item>
+                    <a-form-item label="與監護人關係" name="guard">
+                        <a-select v-model:value="student.guard" placeholder="請選擇與監護人關係"> 
+                            <a-select-option value="M">母親</a-select-option>
+                            <a-select-option value="F">父親</a-select-option>
+                            <a-select-option value="O">其他</a-select-option> 
+                        </a-select>
+                    </a-form-item>
+                    <a-form-item label="與監護人同住" name="live_same">
+                        <a-checkbox v-model:checked="student.live_same">
+                            與監護人同住
+                        </a-checkbox>
+                    </a-form-item>
+                </div>
+            </a-card>
+
+            <!-- 緊急聯絡人卡片 -->
+            <a-card title="緊急聯絡人信息" class="shadow-md" v-if="activeKeys.includes('emergency_contact')">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a-form-item label="緊急聯絡人姓名" name="ec_name">
+                        <a-input v-model:value="student.ec_name" placeholder="請輸入緊急聯絡人姓名" />
+                    </a-form-item>
+                    <a-form-item label="關係" name="ec_rel">
+                        <a-input v-model:value="student.ec_rel" placeholder="請輸入關係" />
+                    </a-form-item>
+                    <a-form-item label="電話" name="ec_tel">
+                        <a-input v-model:value="student.ec_tel" placeholder="請輸入電話" />
+                    </a-form-item>
+                    <a-form-item label="地區" name="ec_area">
+                        <a-input v-model:value="student.ec_area" placeholder="請輸入地區" />
+                    </a-form-item>
+                    <a-form-item label="郵政編碼" name="ec_postal_code">
+                        <a-input v-model:value="student.ec_postal_code" placeholder="請輸入郵政編碼" />
+                    </a-form-item>
+                    <a-form-item label="道路" name="ec_road">
+                        <a-input v-model:value="student.ec_road" placeholder="請輸入道路名稱" />
+                    </a-form-item>
+                    <a-form-item label="詳細地址" name="ec_address">
+                        <a-textarea v-model:value="student.ec_address" placeholder="請輸入詳細地址" />
+                    </a-form-item>
+                </div>
+            </a-card>
+
+            <!-- 監護人資訊卡片 -->
+            <a-card title="監護人資訊" class="shadow-md" v-if="activeKeys.includes('guardian') && (student.guard == 'O' || !student.live_same)">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <template v-if="student.guard == 'O'">
+                        <a-form-item label="監護人姓名" name="g_name">
+                            <a-input v-model:value="student.g_name" placeholder="請輸入監護人姓名" />
+                        </a-form-item>
+                        <a-form-item label="關係" name="g_relation">
+                            <a-input v-model:value="student.g_relation" placeholder="請輸入關係" />
+                        </a-form-item>
+                        <a-form-item label="職業" name="g_profession">
+                            <a-input v-model:value="student.g_profession" placeholder="請輸入職業" />
+                        </a-form-item>
+                    </template>
+                    <a-form-item label="地區" name="g_area">
+                        <a-input v-model:value="student.g_area" placeholder="請輸入地區" />
+                    </a-form-item>
+                    <a-form-item label="郵政編碼" name="g_postal_code">
+                        <a-input v-model:value="student.g_postal_code" placeholder="請輸入郵政編碼" />
+                    </a-form-item>
+                    <a-form-item label="道路" name="g_road">
+                        <a-input v-model:value="student.g_road" placeholder="請輸入道路名稱" />
+                    </a-form-item>
+                    <a-form-item label="詳細地址" name="g_address">
+                        <a-textarea v-model:value="student.g_address" placeholder="請輸入詳細地址" />
+                    </a-form-item>
+                    <a-form-item label="電話" name="g_tel">
+                        <a-input v-model:value="student.g_tel" placeholder="請輸入電話" />
+                    </a-form-item>
+                    <a-form-item label="手機" name="guardmobile">
+                        <a-input v-model:value="student.guardmobile" placeholder="請輸入監護人手機" />
+                    </a-form-item>
+                </div>
+            </a-card>
+
+            <!-- 學校資訊卡片 -->
+            <a-card title="學校信息" class="shadow-md" v-if="activeKeys.includes('school')">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <a-form-item label="校部編號" name="s_code">
+                        <a-input v-model:value="student.s_code" placeholder="請輸入校部編號" />
+                    </a-form-item>
+                    <a-form-item label="年級" name="grade">
+                        <a-input v-model:value="student.grade" placeholder="請輸入年級" />
+                    </a-form-item>
+                    <a-form-item label="班級" name="class">
+                        <a-input v-model:value="student.class" placeholder="請輸入班級" />
+                    </a-form-item>
+                    <a-form-item label="班內序號" name="c_no">
+                        <a-input v-model:value="student.c_no" placeholder="請輸入班內序號" />
+                    </a-form-item>
+                </div>
+            </a-card>
+
+            <div class="flex justify-center gap-4 mt-10">
+                <a-button 
+                v-if="isEditMode"
+                type="primary" 
+                size="large"
+                class="min-w-[120px] bg-green-600 hover:bg-green-700 transition-colors"
+                @click="submitForm"
+                :loading="submitting"
+                >
+                保存信息
+                </a-button>
+                <a-button 
+                v-if="isEditMode"
+                size="large"
+                class="min-w-[120px]"
+                @click="toggleEditMode"
+                :disabled="submitting"
+                >
+                取消
+                </a-button>
+            </div>
             </a-form>
         </div>
         <!-- <a-typography-title :level="3">個人文件檔案</a-typography-title> -->
@@ -524,10 +459,9 @@
 
 <script>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link,router } from '@inertiajs/vue3';
 import { UserOutlined, RetweetOutlined,CheckOutlined,CloseOutlined } from '@ant-design/icons-vue';
 import UploadAvatars from "../../Components/UploadAvatars.vue";
-
 
 export default {
     components: {
@@ -538,23 +472,23 @@ export default {
         CheckOutlined,
         CloseOutlined
     },
-    props: ['student'],
+    props: ['student','nations'],
     data() {
         return {
-            header_zh:{'avatar':'頭像照片','basic':'基本信息','id_card':'證件信息','detail':'補充信息',
-                        'address':'住址信息','bank':'銀行信息','parent':'父母信息','guardian':'監護人信息','health':'健康信息','siblings':'本校兄弟姊妹'},
+            header_zh:{'avatar':'頭像照片','basic':'基本信息','id_card':'證件信息',
+                        'contact':'聯絡信息','school':'學校信息','family':'父母信息','guardian':'監護人信息'},
             breadcrumb: [
                 { label: "主控台", url: route('director.dashboard') },
                 { label: "學人個人檔案", url: null }
             ],
             columnSiblings:[
-                {title:'姓名', dataIndex: 'name_zh'},
+                {title:'姓名', dataIndex: 'name_c'},
                 {title:'性別', dataIndex: 'gender'},
                 {title:'出生日期', dataIndex: 'dob'},
                 {title:'就讀班級', dataIndex: 'klasses'},
             ],
             rules: {
-                name_zh: { required: true },
+                name_c: { required: true },
                 id_type: { required: true },
                 id_type_other: { required: true },
                 issue_place_other: { required: true },
@@ -579,30 +513,18 @@ export default {
                 { value: 'CN', label: '內地' },
                 { value: 'OT', label: '其他' },
             ],
-
-            activeKeys: ['all'],
-            isEdit: false,
+            activeKeys: [ "avatar", "basic", "id_card", "contact", "school", "family", "guardian" ],
             labelCol: { span: 10 }, 
             wrapperCol: { span: 14 },
+            isEditMode:false,
+            submitting:false,
         }
     },
     created() {
-        this.init()        
+        // this.init()    
     },
     mounted(){
     },  
-    watch:{
-        activeKeys: {
-            handler (newVal, oldVal) {
-                if(newVal.includes('all') && oldVal.includes('all')  &&  newVal.length>1){
-                    this.activeKeys=this.activeKeys.filter(x=>x!='all')
-                }else if(newVal.includes('all') && newVal.length>1){
-                    this.activeKeys=["all"]
-                }
-            }
-        }
-       
-    },
     methods: {     
         init(){
             if (this.student.address == null) this.student.address = {}
@@ -643,9 +565,6 @@ export default {
             // this.student.mother=this.student.relations.find(r=>r.relation=='0MOTHER')
             // this.student.guardian=this.student.relations.find(r=>r.relation=='2GUARDIAN')
         },
-        onChangeEditMode() {
-            console.log(this.isEdit);
-        },
         onFinish() {
             console.log(this.student.health);
             this.$inertia.patch(route('director.students.update', this.student.id), this.student, {
@@ -673,8 +592,37 @@ export default {
         },
         deselectAll() {
             this.activeKeys = [];
-        }
+        },
+        toggleEditMode(){
+            router.reload({
+                only: ['student'],
+                preserveScroll: true,
+                onFinish: () => {
+                    this.isEditMode = false
+                }
+            })
+        },
+        resetForm (){
 
+        },
+        submitForm (){
+            this.submitting = true
+            try{
+                router.put(route('director.students.update', this.student.id),this.student, {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        this.isEditMode = false
+                        this.submitting = false
+                    },
+                    onError: () => {
+                        this.submitting = false
+                    }
+                })
+            }catch(error){
+                console.log(error);
+                this.submitting = false
+            }
+        }
     },
 }
 </script>
@@ -698,5 +646,32 @@ export default {
     
 }
 
+.ant-card {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e8e8e8;
+}
+
+.ant-card-head {
+  @apply bg-gradient-to-r from-blue-500 to-indigo-600 text-white !important;
+}
+
+/* 表单标签样式 */
+.ant-form-item-label > label {
+  font-weight: 500;
+  color: #333;
+}
+
+/* 输入框在编辑模式下的样式 */
+.ant-input, .ant-select-selector, .ant-picker {
+  border-radius: 8px !important;
+}
+
+/* 添加一些间距和响应式调整 */
+@media (max-width: 768px) {
+  .grid-cols-3, .grid-cols-2 {
+    grid-template-columns: 1fr;
+  }
+}
 
 </style>

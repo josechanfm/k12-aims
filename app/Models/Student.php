@@ -22,7 +22,7 @@ class Student extends Model implements HasMedia
         'name_c',
         'name_p',
         'sex',
-        'b_date',
+        'b_date', 
         'b_place',
         'id_type',
         'id_no',
@@ -70,16 +70,16 @@ class Student extends Model implements HasMedia
         'g_road',
         'g_address',
         'g_tel',
-        'guardmobile'
+        'guardmobile' //
     ];
     
     // 建議添加的日期轉換和類型轉換
     protected $dates = [
-        'B_DATE',
-        'I_DATE',
-        'V_DATE',
-        'S6_IDATE',
-        'S6_VDATE'
+        'n_date',
+        'i_date',
+        'v_date',
+        's6_idate',
+        's6_vdate'
     ];
 
     public static function boot(){

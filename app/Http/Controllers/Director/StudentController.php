@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\StudentDetail;
 use App\Models\Klass;
 use App\Models\Course;
+use App\Models\Config;
 use App\Models\Relative;
 use App\Models\Year;
 use App\Models\Grade;
@@ -116,12 +117,12 @@ class StudentController extends Controller
         $student->relatives;
         //$student->guardians;
         //$student->archives=$student->archives();
-        
         $student->medias=$student->klassStudent?$student->klassStudent->media->all():null;
         $student->avatars=$student->avatars();
         $student->siblings=$student->siblings();
         return Inertia::render('Director/StudentProfile',[
-            'student'=>$student
+            'student' => $student,
+            'nations' => Config::item('nations')
         ]);
     }
 
@@ -145,40 +146,47 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {  
-        if($student->id != $request->id){
-            return redirect()->back()->withErrors(['code'=>'match','message'=>'Student Id not match.']);
-        }
-        $student->update($request->all());
-        //
-        foreach($request->relatives as $relative){
-            $student->relatives()->updateOrCreate(['relation'=>$relative['relation']],$relative);
-        }
-        //
+        // if($student->id != $request->id){
+        //     return redirect()->back()->withErrors(['code'=>'match','message'=>'Student Id not match.']);
+        // }
+        // $student->update($request->all());
+        // //
+        // foreach($request->relatives as $relative){
+        //     $student->relatives()->updateOrCreate(['relation'=>$relative['relation']],$relative);
+        // }
+        // //
      
-        if(isset($request->address['id'])){
-            $student->address->update($request->address);
-        }else{
-            $student->address()->create($request->address);
-        }
-        if(isset($request->bank['id'])){
-            $student->bank->update($request->bank);
-        }else{
-            $student->bank()->create($request->bank);
-        }
+        // if(isset($request->address['id'])){
+        //     $student->address->update($request->address);
+        // }else{
+        //     $student->address()->create($request->address);
+        // }
+        // if(isset($request->bank['id'])){
+        //     $student->bank->update($request->bank);
+        // }else{
+        //     $student->bank()->create($request->bank);
+        // }
         
 
-        if(isset($request->detail['id'])){
-            $student->detail->update($request->detail);
-        }else{
-            $student->detail()->create($request->detail);
-        }
-        if(isset($request->health['id'])){
-            $student->health->update($request->health);
-        }else{
-            $student->health()->create($request->health);
-        }
+        // if(isset($request->detail['id'])){
+        //     $student->detail->update($request->detail);
+        // }else{
+        //     $student->detail()->create($request->detail);
+        // }
+        // if(isset($request->health['id'])){
+        //     $student->health->update($request->health);
+        // }else{
+        //     $student->health()->create($request->health);
+        // }
        
-        return redirect()->back();
+        // return redirect()->back();
+        // dd($request->all());
+        $student->update($request->all());
+
+        return redirect()->back()->with([
+            'student' => $student->fresh(),
+            'success' => '學生信息已更新'
+        ]);
     }
 
     /**
