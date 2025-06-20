@@ -143,11 +143,16 @@ class Student extends Model implements HasMedia
         return $klassStudent->getMedia('avatar')->first();
     }
     public function courses(){
-        return $this->belongsToMany(Course::class,'course_student');
+        return $this->belongsToMany(Course::class,'course_student')->withPivot('id as course_student_id');
     }
-    public function coursesScores(){
-        return $this->belongsToMany(Course::class,'course_students')->with('scores');
+    public function scores(){
+        return $this->hasManyThrough(Score::class, CourseStudent::class, 'course_id','course_student_id');
+        // return $this->belongsToMany(Student::class,'course_student')->withPivot('id as pivot_course_student_id');
     }
+
+    // public function coursesScores(){
+    //     return $this->belongsToMany(Course::class,'course_student')->with('scores');
+    // }
     public function address(){
         return $this->morphOne(Address::class, 'addressable');
     }

@@ -386,4 +386,19 @@ Route::group([
 
 });
 
+
+Route::group([
+    'prefix'=>'/statistic',
+    'middleware'=>[
+        'auth:sanctum',
+        config('jetstream.auth_session'),
+        'verified',
+        ]
+],function () {
+    Route::get('/',[App\Http\Controllers\Admin\StatisticController::class,'index'])->name('statistic.dashboard');
+
+});
+
+
+
 require __DIR__ . '/auth.php';
