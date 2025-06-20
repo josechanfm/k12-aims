@@ -15,29 +15,15 @@ class DummySeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run($year=null)
     {
-
-        $currentYear=date('Y');
-        //Year::query()->update(['current_year'=>false]);
-        $year=Year::where('code',$currentYear)->first();
-        if(empty($year)){
-            $year=Year::create([
-                'code'=>$currentYear,
-                'title'=>$currentYear.'-'.($currentYear+1),
-                'start'=>$currentYear.'-09-01',
-                'end'=>($currentYear+1).'-06-30',
-                'current_year'=>1,
-                'current_term'=>1,
-                'active'=>1
-            ]);
-        };
-
         $this->call([
             StudentSeeder::class,
-            GradeSeeder::class, 
-            //KlassSeeder::class
         ]);
+        $years=Year::all();
+        foreach($years as $year){
+            $this->call(GradeSeeder::class, false, ['year'=>$year]);
+        }
 
 
     }

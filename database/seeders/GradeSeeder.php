@@ -16,11 +16,13 @@ class GradeSeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run($year=null)
     {
         $studentId=1;
-        $currentYear=date('Y');
-        $year=Year::where('code',$currentYear)->first();
+        if($year==null){
+            $currentYear=date('Y');
+            $year=Year::where('code',$currentYear)->first();
+        }
         $initial=array_column(Config::item('klass_letters'),'label');
         $initial=array_slice($initial,0,4);
         //Kindergarten

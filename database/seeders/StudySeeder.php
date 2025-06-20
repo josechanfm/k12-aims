@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\Year;
 use App\Models\Study;
 use App\Models\Subject;
 
@@ -15,8 +16,11 @@ class StudySeeder extends Seeder
      *
      * @return void
      */
-    public function run()
+    public function run($year=null)
     {
+        if($year==null){
+            $year=Year::currentYear();
+        }
         $data=[
             ['code'=>'NAT', 'title_zh'=>'科學', 'title_en'=>'Nature Science',   'in_transcript'=>'1',   'active'=>'1', 'version'=> '1'],
             ['code'=>'MAN', 'title_zh'=>'普通話', 'title_en'=>'Mandarin',   'in_transcript'=>'1',   'active'=>'1', 'version'=> '1'],
@@ -53,7 +57,7 @@ class StudySeeder extends Seeder
         ];
 
         foreach($data as $d){
-             $d['year_id']=1;
+             $d['year_id']=$year->id;
             $study=Study::create($d);
             $subjectIds=array_column(Subject::get()->toArray(),'id');
             $study->subjects()->attach($subjectIds);
