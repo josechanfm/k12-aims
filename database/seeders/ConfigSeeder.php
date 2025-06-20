@@ -651,14 +651,14 @@ class ConfigSeeder extends Seeder
         ]);
 
         DB::table('configs')->insert([
-            'key' => 'r_areas',
+            'key' => 'areas',
             'value' => '[
-                {"id": "1", "r_area": "M", "c_name": "澳門", "e_name": "Macau"},  
-                {"id": "2", "r_area": "T", "c_name": "氹仔", "e_name": "Taipa"},
-                {"id": "3", "r_area": "C", "c_name": "路環", "e_name": "Colone"},
-                {"id": "4", "r_area": "ZH", "c_name": "珠海", "e_name": "ZhuHai"},
-                {"id": "5", "r_area": "ZS", "c_name": "中山", "e_name": "ZhongShan"},
-                {"id": "6", "r_area": "O", "c_name": "其他", "e_name": "Others"}
+                {"id": "1", "area": "M", "name_c": "澳門", "name_p": "Macau"},  
+                {"id": "2", "area": "T", "name_c": "氹仔", "name_p": "Taipa"},
+                {"id": "3", "area": "C", "name_c": "路環", "name_p": "Colone"},
+                {"id": "4", "area": "ZH", "name_c": "珠海", "name_p": "ZhuHai"},
+                {"id": "5", "area": "ZS", "name_c": "中山", "name_p": "ZhongShan"},
+                {"id": "6", "area": "O", "name_c": "其他", "name_p": "Others"}
             ]'
         ]);
     }

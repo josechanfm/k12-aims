@@ -120,9 +120,13 @@ class StudentController extends Controller
         $student->medias=$student->klassStudent?$student->klassStudent->media->all():null;
         $student->avatars=$student->avatars();
         $student->siblings=$student->siblings();
+        
         return Inertia::render('Director/StudentProfile',[
             'student' => $student,
-            'nations' => Config::item('nations')
+            'nations' => Config::item('nations'),
+            'places' => Config::item('places'),
+            'areas' => Config::item('areas'),
+            'id_list' => Config::item('id_list'),
         ]);
     }
 

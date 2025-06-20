@@ -215,18 +215,18 @@
                 </a-form-item>
                 <a-form-item label="性别" name="sex">
                     <a-select v-model:value="student.sex" placeholder="請選擇性別">
-                    <a-select-option value="M">男</a-select-option>
-                    <a-select-option value="F">女</a-select-option>
+                        <a-select-option value="M">男</a-select-option>
+                        <a-select-option value="F">女</a-select-option>
                     </a-select>
                 </a-form-item>
                 <a-form-item label="出生日期" name="b_date">
                     <a-date-picker v-model:value="student.b_date" class="w-full" :valueFormat="dateFormat"/>
                 </a-form-item>
                 <a-form-item label="出生地點" name="b_place">
-                    <a-input v-model:value="student.b_place" placeholder="請輸入出生地點" />
+                    <a-select v-model:value="student.b_place" :options="places.map((x)=> ({ 'label':x.name_c , 'value':x.id }))" placeholder="請選擇出生地點" />
                 </a-form-item>
                 <a-form-item label="國籍" name="nation">
-                    <a-input v-model:value="student.nation" placeholder="請輸入國籍" />
+                    <a-select v-model:value="student.nation" :options="nations.map((x)=> ({ 'label':x.name_c , 'value':x.id }))" placeholder="請選擇國籍" />
                 </a-form-item>
                 <a-form-item label="籍貫" name="origin">
                     <a-input v-model:value="student.origin" placeholder="請輸入籍貫" />
@@ -238,17 +238,14 @@
             <a-card title="證件信息" class="shadow-md" v-if="activeKeys.includes('id_card')">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <a-form-item label="證件類型" name="id_type">
-                        <a-select v-model:value="student.id_type" placeholder="請選擇證件類型">
-                            <a-select-option value="身份證">身份證</a-select-option>
-                            <a-select-option value="護照">護照</a-select-option>
-                            <a-select-option value="港澳通行證">港澳通行證</a-select-option>
+                        <a-select v-model:value="student.id_type" :options="id_list.map((x)=>({ 'label':x.name_c , 'value':x.id }))" placeholder="請選擇證件類型">
                         </a-select>
                     </a-form-item>
                     <a-form-item label="證件號碼" name="id_no">
                         <a-input v-model:value="student.id_no" placeholder="請輸入證件號碼" />
                     </a-form-item>
                     <a-form-item label="簽發地點" name="i_place">
-                        <a-input v-model:value="student.i_place" placeholder="請輸入簽發地點" />
+                        <a-select v-model:value="student.i_place" :options="places.map((x)=> ({ 'label':x.name_c , 'value':x.id }))" placeholder="請輸入簽發地點" />
                     </a-form-item>
                     <a-form-item label="簽發日期" name="i_date">
                         <a-date-picker v-model:value="student.i_date" class="w-full" />
@@ -257,7 +254,7 @@
                         <a-date-picker v-model:value="student.v_date" class="w-full" />
                     </a-form-item>
                     <a-form-item label="逗留許可" name="s6_type">
-                        <a-select v-model:value="student.s6_type" placeholder="請選擇逗留許可">
+                        <a-select v-model:value="student.s6_type" placeholder="請選擇逗留許可" allowClear>
                             <a-select-option :value="1">永久 S6</a-select-option>
                             <a-select-option :value="2">有限期 S6</a-select-option>
                             <a-select-option :value="3">其他逗留許可</a-select-option> 
@@ -282,9 +279,9 @@
                         <a-input v-model:value="student.mobile" placeholder="請輸入手機號碼" />
                     </a-form-item>
                     <a-form-item label="地區" name="area">
-                        <a-input v-model:value="student.area" placeholder="請輸入地區" />
+                        <a-select v-model:value="student.area" :options="areas.map((x)=> ({ 'label':x.name_c , 'value':x.area }))" placeholder="請輸入地區" />
                     </a-form-item>
-                    <a-form-item label="郵政編碼" name="postal_code">
+                    <a-form-item label="郵政編碼" name="postal_code" v-if="student.area == 'ZH' || student.area == 'ZS'">
                         <a-input v-model:value="student.postal_code" placeholder="請輸入郵政編碼" />
                     </a-form-item>
                     <a-form-item label="道路" name="road">
@@ -358,9 +355,9 @@
                         <a-input v-model:value="student.ec_tel" placeholder="請輸入電話" />
                     </a-form-item>
                     <a-form-item label="地區" name="ec_area">
-                        <a-input v-model:value="student.ec_area" placeholder="請輸入地區" />
+                        <a-select v-model:value="student.ec_area" :options="areas.map((x)=> ({ 'label':x.name_c , 'value':x.area }))" placeholder="請輸入地區" />
                     </a-form-item>
-                    <a-form-item label="郵政編碼" name="ec_postal_code">
+                    <a-form-item label="郵政編碼" name="ec_postal_code" v-if="student.ec_area == 'ZH' || student.ec_area == 'ZS'">
                         <a-input v-model:value="student.ec_postal_code" placeholder="請輸入郵政編碼" />
                     </a-form-item>
                     <a-form-item label="道路" name="ec_road">
@@ -472,7 +469,7 @@ export default {
         CheckOutlined,
         CloseOutlined
     },
-    props: ['student','nations'],
+    props: ['student','nations','places','areas','id_list'],
     data() {
         return {
             header_zh:{'avatar':'頭像照片','basic':'基本信息','id_card':'證件信息',
