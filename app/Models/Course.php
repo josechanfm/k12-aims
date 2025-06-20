@@ -71,7 +71,8 @@ class Course extends Model
         )->withoutGlobalScopes();
     }
     public function scores(){
-        return $this->belongsToMany(Student::class,'course_student')->withPivot('id as pivot_course_student_id');
+        return $this->hasManyThrough(Score::class, CourseStudent::class, 'course_id','course_student_id');
+        // return $this->belongsToMany(Student::class,'course_student')->withPivot('id as pivot_course_student_id');
     }
     public function scoreColumns(){
         return $this->hasMany(ScoreColumn::class)->orderBy('term_id')->orderByRaw('-sequence DESC');
@@ -110,8 +111,12 @@ class Course extends Model
         return $data;
         //return $students;
     }
+    
+    // 班別科目的所有學生的分數.輸出結果為二維,Key value object array,
+    // 第一維key是student_id, value 有學生名編號等最基本資料, 
+    // 同時包括有scores結果,亦是輸出的第二維, key 是score_column_id, value 是score table record 的內容. 
+    // 最主要是取得分數欄. 亦即某班別的一個科目, 某學生的所有分數結果.
     public function studentsScores(){
-
         $students=$this->students;
         $scores=$this->allScores;
         // dd($scores);

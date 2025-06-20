@@ -9,9 +9,12 @@ use Illuminate\Support\Facades\Validator;
 class Score extends Model
 {
     use HasFactory;
-    protected $fillable=['klass_student_id','score_column_id','point'];
+    protected $fillable=['course_student_id','score_column_id','student_id','point'];
     protected $hidden = [ 'laravel_through_key' ];
 
+    public function courseStudent(){
+        return $this->belongsTo(CourseStudent::class);
+    }
 
     public function score_column(){
         return $this->belongsTo(ScoreColumn::class);

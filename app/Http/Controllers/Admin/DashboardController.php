@@ -7,11 +7,13 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Year;
 use App\Models\Grade;
-use App\Models\Config;
+use App\Models\Course;
+use App\Models\Student;
 
 class DashboardController extends Controller
 {
     public function index(){
+   
         $currentYear=Year::currentYear();
         return  Inertia::render('Admin/Dashboard',[
             'currentYear'=>$currentYear,

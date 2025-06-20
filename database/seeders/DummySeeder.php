@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Config;
 use App\Models\Year;
+use App\Models\Course;
 
 class DummySeeder extends Seeder
 {
@@ -16,6 +17,7 @@ class DummySeeder extends Seeder
      */
     public function run()
     {
+
         $currentYear=date('Y');
         //Year::query()->update(['current_year'=>false]);
         $year=Year::where('code',$currentYear)->first();
@@ -36,5 +38,7 @@ class DummySeeder extends Seeder
             GradeSeeder::class, 
             //KlassSeeder::class
         ]);
+
+
     }
 }
