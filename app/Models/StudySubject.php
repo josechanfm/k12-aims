@@ -18,4 +18,7 @@ class StudySubject extends Model
    function subject(){
         return $this->belongsTo(Subject::class);
    }
+   function courses(){
+        return $this->hasMany(Course::class);
+   }
 }

@@ -8,6 +8,8 @@ use App\Models\ScoreColumn;
 use App\Models\Score;
 use App\Models\Course;
 use App\Models\Klass;
+use App\Models\Subject;
+use App\Models\Grade;
 use App\Models\Config;
 use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Support\Str;
@@ -46,9 +48,13 @@ class ScoreColumnController extends Controller
     public function details(Course $course)
     {
         $klasses = Klass::all();
+        $subjects = Subject::all();
+        $grades = Grade::all();
         return Inertia::render('Director/ScoreColumnDetails', [
             'terms' => Config::item('year_terms'),
             'klasses' => $klasses,
+            'subjects' => $subjects,
+            'grades' => $grades,
         ]);
     }
 
@@ -56,6 +62,28 @@ class ScoreColumnController extends Controller
     {
         $letter=ScoreColumn::where('course_id',$course->id)->orderBy('column_letter','DESC')->first()->column_letter;
         $data=$request->all();
+        $data['field_name']=Str::uuid();
+        $data['column_letter']=++$letter;
+        $data['for_transcript']=false;
+        $data['is_total']=false;
+
+        $scoreColumn = $course->scoreColumns()->create($data);
+        // ScoreColumn::create($data);
+
+        $course->upsertMergeScoreColumn();
+
+        return redirect()->back()->with('data',['id' => $scoreColumn->id ]);
+    }
+
+    public function batchStore(Request $request){
+        $data=$request->all();
+        dd($data);
+        
+        foreach($data as $key => $value ){
+            $this->handleStore( $course_id  );
+        }
+
+        $letter=ScoreColumn::where('course_id',$course->id)->orderBy('column_letter','DESC')->first()->column_letter;
         $data['field_name']=Str::uuid();
         $data['column_letter']=++$letter;
         $data['for_transcript']=false;
@@ -150,6 +178,28 @@ class ScoreColumnController extends Controller
 
     public function course(Course $course){
         return $course->scoreColumns;
+    }
+
+    public function getKlassBySubject(Subject $subject){
+        $study_subject = $subject->studySubject;
+        $course = Course::whereIn('study_subject_id', $study_subject->pluck('id') )->get();
+        $klass_id = $course->pluck('klass_id')->unique();
+        return Klass::whereIn('id', $klass_id)->get();
+    }
+
+    public function getScoreColumn(Subject $subject, Klass $klass)
+    {
+        $study_subject = $subject->studySubject;
+        $course = Course::whereIn('study_subject_id', $study_subject->pluck('id'))
+            ->where('klass_id', $klass->id)->first();
+        // $course->scoreColumns;
+        return $course;
+    }
+    public function getGradeScoreColumn(Subject $subject, $grade_ids)
+    {
+        $klass = Klass::whereIn('grade_id', explode(",", $grade_ids))->get();
+        $course = Course::whereIn('klass_id', array_column( $klass->toArray() , 'id'))->get();
+        return $course;
     }
 
     public function reorder(Request $request){

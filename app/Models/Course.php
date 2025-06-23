@@ -9,7 +9,7 @@ class Course extends Model
 {
     use HasFactory;
     protected $fillable=['klass_id','study_subject_id','code','title_zh','title_en','description','active'];
-    protected $appends=['student_count','subject_heads','teacher_ids','teaching','study_subject'];
+    protected $appends=['student_count','subject_heads','teacher_ids','teaching','study_subject', 'score_columns','klass_name'];
     // protected $casts=['subject_head_ids'=>'array'];
 
       public function studySubject()
@@ -29,8 +29,17 @@ class Course extends Model
         return $this->staffs;
         
     }
-    public function getStudentCountAttribute(){
-        return $this->students->count();
+    public function getStudentCountAttribute(){ /// 優化 只計算students不載入數據
+        if ($this->relationLoaded('students')) {
+            return $this->students->count();
+        }
+        return $this->students()->count();
+    }
+    public function getScoreColumnsAttribute(){ 
+        return $this->scoreColumns()->get();
+    }
+    public function getKlassNameAttribute(){ 
+        return $this->klass->name_zh;
     }
     public function getSubjectHeadsAttribute(){
         if(is_array($this->study_subject->subject_head_ids)){

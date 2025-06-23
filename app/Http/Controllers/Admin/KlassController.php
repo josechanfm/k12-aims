@@ -13,6 +13,7 @@ use App\Models\Year;
 use App\Models\Grade;
 use App\Models\Study;
 use App\Models\Staff;
+use App\Models\StudySubject;
 use App\Models\Topic;
 use Illuminate\Support\Facades\Validator;
 
@@ -33,20 +34,19 @@ class KlassController extends Controller
         $year=Year::currentYear();
         $grades=$year->grades()->with(['year'])->get();
         $klasses=[];
-        collect( $grades)->each(function($grade)use($gradeYear,&$klasses){
-               if( $grade->grade_year!=$gradeYear){
-                    return true;
-                }
-                 $klasses=$grade->klasses;
-                collect( $grade->klasses)->each(function($klass)use(&$klasses){
-                   $klass->courses;
-                    collect( $klass->courses)->each(function($course){
-                   $course->subject;
+        $klasses = collect($grades)
+            ->where('grade_year', $gradeYear)  // Filter grades by year first
+            ->flatMap(function($grade) {       // Get all klasses from matching grades
+                return $grade->klasses->map(function($klass) {
+                    // Eager load relationships with specific columns
+                    $klass->load([
+                        'courses'=>fn($q)=>$q->without('scoreColumns'),
+                        'students' => fn($q) => $q->select('students.id', 'students.name_c', 'students.name_p')
+                    ]);
+                    return $klass;
                 });
-                });
-        });
-        // dd($klasses->toArray());
-        //echo json_encode($grades->toArray());die();
+            });
+   
         //$klasses=$year->grades()->where('grade_year',$gradeYear)->with(['klasses','klasses.courses'])->get();
         //dd([$klasses->toArray(),$grades->toArray(),$year->toArray()]);
         // $studies=Study::where('active',1)->get();
@@ -58,7 +58,6 @@ class KlassController extends Controller
             'klassLetters'=>Config::item('klass_letters'),
             'studyStreams'=>Config::item('study_streams'),
             'gradeYear'=>$gradeYear,
-            // 'studies'=>$studies,
             'teachers'=>Staff::teachers()
         ]);        
 
@@ -232,7 +231,7 @@ class KlassController extends Controller
                     ['letter' =>$letter->label], 
                     [ 'study_id'=>$studiesObj[$grade->grade_year]??null ,
                     'tag'=>$grade->tag.$letter->label,
-                    'name_zh'=>$grade->title_en.$letter->label ,
+                    'name_en'=>$grade->title_en.$letter->label ,
                     'name_zh'=>$grade->title_zh.$letter->value    ]
                 );
             }

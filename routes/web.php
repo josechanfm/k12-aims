@@ -222,8 +222,11 @@ Route::group([
         
         Route::post('course/{course}/score_column/reorder',[App\Http\Controllers\Director\ScoreColumnController::class,'reorder'])->name('director.course.scoreColumn.reorder');
         Route::get('score_columns/details/{course?}',[App\Http\Controllers\Director\ScoreColumnController::class, 'details'])->name('director.scoreColumn.details');
+        Route::get('score_columns/subject/{subject?}/study',[App\Http\Controllers\Director\ScoreColumnController::class, 'getKlassBySubject'])->name('director.course.scoreColumn.getKlassBySubject');
+        Route::get('score_columns/subject/{subject?}/grade/{grade?}',[App\Http\Controllers\Director\ScoreColumnController::class, 'getGradeScoreColumn'])->name('director.course.scoreColumn.getGradeScoreColumn');
+        Route::get('score_columns/subject/{subject?}/klass/{klass?}',[App\Http\Controllers\Director\ScoreColumnController::class, 'getScoreColumn'])->name('director.course.scoreColumn.getScoreColumn');
+        Route::post('course/score_columns/batch_store',[App\Http\Controllers\Director\ScoreColumnController::class,'batchStore'])->name('director.course.scoreColumns.batchStore');
         Route::resource('course/{course?}/score_columns',App\Http\Controllers\Director\ScoreColumnController::class)->names('director.course.scoreColumns');
-        Route::get('course/{course?}/score_columns',[App\Http\Controllers\Director\ScoreColumnController::class, 'course'])->name('director.course.getScoreColumns');
 
         Route::post('/makeup/create_or_cancel',[App\Http\Controllers\Director\MakeupController::class,'createOrCancel'])->name('director.makeup.createOrCancel');
         Route::post('/makeup/update',[App\Http\Controllers\Director\MakeupController::class,'update'])->name('director.makeup.update');

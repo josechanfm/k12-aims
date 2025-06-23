@@ -11,10 +11,12 @@ class Subject extends Model
 
     use HasFactory;
     
-    public function grade(){
-        return $this->belongsTo(Grade::class);
-    }
+  
     public function studys(){
         return $this->belongsToMany(Study::class)->withPivot('subject_head_ids');
+    }
+
+    public function studySubject(){
+        return $this->hasMany( StudySubject::class);
     }
 }
