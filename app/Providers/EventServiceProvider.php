@@ -14,6 +14,10 @@ use App\Models\Additive;
 use App\Observers\AdditiveObserver;
 use App\Models\Task;
 use App\Observers\TaskObserver;
+use App\Models\KlassStudent;
+use App\Observers\KlassStudentObserver;
+
+
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -36,6 +40,7 @@ class EventServiceProvider extends ServiceProvider
     public function boot()
     {
         Klass::observe(KlassObserver::class);
+        KlassStudent::observe(KlassStudentObserver::class);
         Course::observe(CourseObserver::class);
         Additive::observe(AdditiveObserver::class);
         Task::observe(TaskObserver::class);

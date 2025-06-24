@@ -9,6 +9,8 @@ use Inertia\Inertia;
 use App\Models\Year;
 use App\Models\Student;
 use App\Models\Klass;
+use App\Models\KlassStudent;
+
 
 class KlassStudentEnrollController extends Controller
 {
@@ -143,7 +145,10 @@ class KlassStudentEnrollController extends Controller
             if( in_array($student['id'],$student_ids)){
                 continue;
             }
-             $klass->students()->attach([$student['id']]);
+            KlassStudent::UpdateOrCreate([
+                'klass_id' => $klass->id,
+                'student_id' => $student['id']
+            ]);
         }
         // $year=Year::where('code',$yearCode)->with(['grades','grades.klasses','grades.klasses.students'])->first();
         //dd( $students->toArray());

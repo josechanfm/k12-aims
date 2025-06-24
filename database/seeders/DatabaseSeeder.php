@@ -24,10 +24,10 @@ class DatabaseSeeder extends Seeder
             // GuardianSeeder::class,
             StaffSeeder::class,
             TeacherSeeder::class,
-
+            SubjectSeeder::class,
             ConfigSeeder::class,
             YearSeeder::class,
-            //StudySeeder::class,
+        
             ThemeTemplateSeeder::class,
             TopicTemplateSeeder::class,
             TranscriptTemplateSeeder::class,
@@ -35,7 +35,8 @@ class DatabaseSeeder extends Seeder
 
             SupplierSeeder::class,
             LocationSeeder::class,
-            ManualSeeder::class
+            ManualSeeder::class,
+            StudentSeeder::class,
             // YearSeeder::class,
             // KlassSeeder::class,
             // ThemeSeeder::class,

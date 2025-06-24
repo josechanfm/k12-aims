@@ -137,6 +137,12 @@
                     
                     </template>
                   </a-table-column>
+                   <a-table-column title="操作" align="center" >
+                    <template #default="{record}">
+                    
+                      <a-button @click="deleteKlassStudent(record)">強制刪除</a-button>
+                    </template>
+                  </a-table-column>
                 </a-table>
               </div>
 
@@ -194,6 +200,10 @@
                       </div>
                     </template>
                   </a-table-column>
+                  <!-- <a-table-column title="鎖定">
+                    <template #default="{ record }">
+                       </template>
+                  </a-table-column> -->
                 </a-table>
               </div>
             </div>
@@ -300,6 +310,19 @@ export default {
     this.selectKlassId = this.klasses[0]?.id || '';
   },
   methods: {
+    deleteKlassStudent(record){
+      console.log(record)
+      this.$inertia.delete(route('admin.klassStudents.destroy', record.pivot.klass_student_id), {
+        preserveScroll: true,
+        preserveState: true,  
+        onSuccess: (page) => {
+          console.log(page);
+        },
+        onError: (err) => {
+          console.log(err);
+        }
+      });
+    },
     visitGradeYear(g) {
       this.$inertia.visit(route('admin.klasses.index', { gradeYear: g.id }), {
         preserveState: true,

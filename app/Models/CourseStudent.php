@@ -15,4 +15,8 @@ class CourseStudent extends Model
     {
         return $this->hasMany(Score::class, 'course_student_id');
     }
+
+    public function course(){
+        return $this->belongsTo(Course::class);
+    }
 }

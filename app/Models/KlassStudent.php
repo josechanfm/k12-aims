@@ -16,7 +16,7 @@ class KlassStudent extends Model implements HasMedia
     use HasFactory;
     use InteractsWithMedia;
     protected $table='klass_student';
-    protected $fillable=['promote_to'];
+    protected $fillable=['promote_to','klass_id','student_id'];
 
     public function registerMediaConversions(Media $media = null): void
     {
@@ -56,4 +56,26 @@ class KlassStudent extends Model implements HasMedia
         return $this->morphMany(Archive::class, 'archivable');
     }
 
+    public function courseStudent(){
+       return $this->hasManyThrough(
+                CourseStudent::class,
+                Course::class,
+                'klass_id',        // courses 表的外键
+                'course_id',       // course_student 表的外键
+                'klass_id',        // klass_student 表的本地键
+                'id'               // courses 表的本地键
+            )->where('course_student.student_id', $this->student_id);
+    }
+    public function scores(){
+            return $this->hasManyThrough(
+                Score::class,
+                CourseStudent::class,
+                'student_id',       // course_student 表中的外键(指向 students 表)
+                'course_student_id', // scores 表中的外键(指向 course_student 表)
+                'student_id',       // klass_student 表中的本地键(指向 students 表)
+                'id'                // course_student 表中的本地键
+            )->whereHas('courseStudent.course', function($query) {
+                $query->where('klass_id', $this->klass_id);
+            });
+     }
 }

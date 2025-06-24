@@ -135,7 +135,14 @@ const list = [{
         key: 'student',
         title: '新生',
         url: '/admin/candidates',
-    }],
+    },
+ {
+        key: 'student',
+        title: '分班',
+        url: '/admin/klassStudentEnrolls',
+    },
+
+],
 }, {
     key: 'director',
     roles: ['master', 'admin', 'director'],

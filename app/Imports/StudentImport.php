@@ -61,11 +61,11 @@ class StudentImport implements ToModel, WithStartRow ,WithValidation, SkipsOnFai
     public function rules(): array
     {
         return [
-            'students-name_zh'=>'required',
-            'students-gender' => 'required|max:1',
-            'students-dob'=>'date',
-            'students-entry_date'=>'date',  
-            'students-id_num'=>'required|unique:students,id_num'
+            'students-name_c'=>'required',
+            'students-id_no' => 'required',
+            // 'students-dob'=>'date',
+            // 'students-entry_date'=>'date',  
+            // 'students-id_num'=>'required|unique:students,id_num'
         ];
     }
     public function getImportedRow(): array{

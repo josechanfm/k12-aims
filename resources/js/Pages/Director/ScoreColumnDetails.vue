@@ -17,7 +17,7 @@
                     <div class="mx-4 w-20 h-1 rounded bg-gray-200"></div>
 
                     <div class="flex items-center" @click="currentSection = 2" :class="{'opacity-50': !selectedSubject}">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white" :class="currentSection >= 2 && selectedKlass ? 'bg-indigo-600' : 'bg-gray-300'">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white" :class="currentSection >= 2 ? 'bg-indigo-600' : 'bg-gray-300'">
                             2
                         </div>
                         <div class="ml-2 font-medium" :class="currentSection === 2 && selectedKlass ? 'text-indigo-700' : 'text-gray-600'">
@@ -26,9 +26,9 @@
                     </div>
 
                     <div class="mx-4 w-20 h-1 rounded bg-gray-200"></div>
-
-                    <div class="flex items-center" @click="currentSection = 3" :class="{'opacity-50': !selectedKlass}">
-                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white" :class="currentSection >= 3 && selectedKlass ? 'bg-indigo-600' : 'bg-gray-300'">
+                    
+                    <div class="flex items-center" @click="currentSection = 3" :class="{'opacity-50': !(selectedKlass || selectedGrade.length != 0 ) }">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-white" :class="currentSection >= 3 ? 'bg-indigo-600' : 'bg-gray-300'">
                             3
                         </div>
                         <div class="ml-2 font-medium" :class="currentSection === 3 ? 'text-indigo-700' : 'text-gray-600'">
@@ -198,10 +198,10 @@
                                                         </div>
                                                     </div>
                                                     <div class="flex space-x-1">
-                                                        <button @click.stop="editItem(index)" class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 flex items-center justify-center">
+                                                        <button @click.stop="editItem(scoreColumn)" class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 flex items-center justify-center">
                                                             <EditOutlined />
                                                         </button>
-                                                        <button @click.stop="deleteItem(index)" class="w-10 h-10 rounded-full bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center">
+                                                        <button @click.stop="deleteItem(scoreColumn)" class="w-10 h-10 rounded-full bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center">
                                                             <DeleteOutlined />
                                                         </button>
                                                     </div>
@@ -265,7 +265,11 @@ export default {
                 })
         },
         selectGrade( grade ){
-            this.selectedGrade.push( grade )
+            if (this.selectedGrade.includes(grade)) {
+                this.selectedGrade = this.selectedGrade.filter(item => item !== grade);
+            } else {
+                this.selectedGrade.push(grade);
+            }
             
             this.currentSection = 3
             
@@ -355,7 +359,19 @@ export default {
                 },
             });
         },
-        deleteItem(index) {
+        editItem(scoreColumn){
+            console.log( scoreColumn )
+        },
+        updateScoreColumnBatch(){
+            this.newScoreColumn.score_column_ids = scoreColumn.id
+            this.$inertia.post(route("director.course.scoreColumns.batchUpdate"), this.newScoreColumn, {
+                preserveScroll: true,
+                preserveState: true,
+                onSuccess: (page) => {
+                },
+            });
+        },
+        deleteItem(scoreColumn) {
             this.selectedCourse.items.splice(index, 1);
         }
     }

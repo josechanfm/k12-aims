@@ -125,6 +125,7 @@ Route::group([
     Route::resource('registrations',App\Http\Controllers\Admin\RegistrationController::class)->names('admin.registrations');
     //Route::get('year/{year}/grades',[App\Http\Controllers\Admin\YearController::class,'grades'])->name('admin.year.grades');
     //
+    Route::resource('klassStudents',App\Http\Controllers\Admin\KlassStudentController::class)->names('admin.klassStudents');
     //用於插入已存在的學生
     Route::resource('klassStudentEnrolls',App\Http\Controllers\Admin\KlassStudentEnrollController::class)
                 ->names('admin.klassStudentEnrolls');
@@ -225,6 +226,7 @@ Route::group([
         Route::get('score_columns/subject/{subject?}/study',[App\Http\Controllers\Director\ScoreColumnController::class, 'getKlassBySubject'])->name('director.course.scoreColumn.getKlassBySubject');
         Route::get('score_columns/subject/{subject?}/grade/{grade?}',[App\Http\Controllers\Director\ScoreColumnController::class, 'getGradeScoreColumn'])->name('director.course.scoreColumn.getGradeScoreColumn');
         Route::get('score_columns/subject/{subject?}/klass/{klass?}',[App\Http\Controllers\Director\ScoreColumnController::class, 'getScoreColumn'])->name('director.course.scoreColumn.getScoreColumn');
+        Route::post('course/score_columns/batch_update',[App\Http\Controllers\Director\ScoreColumnController::class,'batchUpdate'])->name('director.course.scoreColumns.batchUpdate');
         Route::post('course/score_columns/batch_store',[App\Http\Controllers\Director\ScoreColumnController::class,'batchStore'])->name('director.course.scoreColumns.batchStore');
         Route::resource('course/{course?}/score_columns',App\Http\Controllers\Director\ScoreColumnController::class)->names('director.course.scoreColumns');
 

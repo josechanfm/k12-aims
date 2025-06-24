@@ -28,7 +28,7 @@ class YearSeeder extends Seeder
                 'current_term'=>1,
                 'active'=>0
             ]);
-            $this->call(StudySeeder::class, false, ['year'=>$year]);
+        $this->call(StudySeeder::class, false, ['year'=>$year]);
 
         }
         $year->update([

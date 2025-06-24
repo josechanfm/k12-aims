@@ -60,7 +60,7 @@ class ScoreColumnController extends Controller
 
     public function store(Course $course, Request $request)
     {
-        $letter=ScoreColumn::where('course_id',$course->id)->orderBy('column_letter','DESC')->first()->column_letter;
+        $letter=ScoreColumn::where('course_id',$course->id)->orderBy('column_letter','DESC')->first()?->column_letter??'A';
         $data=$request->all();
         $data['field_name']=Str::uuid();
         $data['column_letter']=++$letter;
@@ -77,26 +77,23 @@ class ScoreColumnController extends Controller
 
     public function batchStore(Request $request){
         $data=$request->all();
-        dd($data);
         
-        foreach($data as $key => $value ){
-            $this->handleStore( $course_id  );
+        foreach($data['course_ids'] as $key => $course_id ){
+            
+            $letter=ScoreColumn::where('course_id',$course_id)->orderBy('column_letter','DESC')->first()?->column_letter??'A';
+
+            $data['field_name']=Str::uuid();
+            $data['column_letter']=++$letter;
+            $data['for_transcript']=false;
+            $data['is_total']=false;
+
+            $course = Course::find( $course_id);
+            $scoreColumn = $course->scoreColumns()->create($data);
+            $course->upsertMergeScoreColumn();
         }
 
-        $letter=ScoreColumn::where('course_id',$course->id)->orderBy('column_letter','DESC')->first()->column_letter;
-        $data['field_name']=Str::uuid();
-        $data['column_letter']=++$letter;
-        $data['for_transcript']=false;
-        $data['is_total']=false;
-
-        $scoreColumn = $course->scoreColumns()->create($data);
-        // ScoreColumn::create($data);
-
-        $course->upsertMergeScoreColumn();
-
-        return redirect()->back()->with('data',['id' => $scoreColumn->id ]);
+        return redirect()->back()->with('data',['id' => 1]);
     }
-
     /**
      * Display the specified resource.
      *
@@ -141,6 +138,11 @@ class ScoreColumnController extends Controller
         // );
 
         return redirect()->back();
+    }
+
+    public function batchUpdate(Request $request){
+        $data=$request->all();
+        dd($data);
     }
 
     private function upsertMergeColumn($course,$scoreColumn){
@@ -197,8 +199,10 @@ class ScoreColumnController extends Controller
     }
     public function getGradeScoreColumn(Subject $subject, $grade_ids)
     {
+        $study_subject = $subject->studySubject;
         $klass = Klass::whereIn('grade_id', explode(",", $grade_ids))->get();
-        $course = Course::whereIn('klass_id', array_column( $klass->toArray() , 'id'))->get();
+        $course = Course::whereIn('study_subject_id', $study_subject->pluck('id'))
+            ->whereIn('klass_id', array_column( $klass->toArray() , 'id'))->get();
         return $course;
     }
 
